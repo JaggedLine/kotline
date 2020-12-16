@@ -3,6 +3,8 @@ import react.dom.render
 
 fun main() {
     render(document.getElementById("root")) {
-        child(App::class) {}
+        child(App::class) {
+
+        }
     }
 }
