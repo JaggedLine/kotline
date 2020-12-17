@@ -2,7 +2,7 @@ import kotlinx.browser.document
 import react.*
 
 external interface GamePageProps: RProps {
-    var setPage: (Pages) -> Unit
+    var showPageFunc: (Pages) -> Unit
 }
 
 class GamePage: RComponent<GamePageProps, RState>() {

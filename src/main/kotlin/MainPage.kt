@@ -5,13 +5,17 @@ import styled.*
 import styled.css
 
 external interface MainPageProps: RProps {
-    var setPage: (Pages) -> Unit
+    var showPageFunc: (Pages) -> Unit
     var fieldProps: List<Pair<Int, RuleSet>>
 }
 
 class MainPage: RComponent<MainPageProps, RState>() {
     override fun RBuilder.render() {
         styledDiv {
+            css {
+                display = Display.flex
+                flexDirection = FlexDirection.column
+            }
             styledDiv {
                 css {
                     margin(50.px)
@@ -19,40 +23,51 @@ class MainPage: RComponent<MainPageProps, RState>() {
                 }
                 styledH1 {
                     css {
-                        +CommonStyles.myH1
+                        color = Color.black
+                        fontSize = 50.px
                     }
                     +"Jagged line"
                 }
                 styledH2 {
                     css {
-                        +CommonStyles.myH2
+                        color = Color.grey
+                        fontSize = 30.px
                     }
-                    +"Build the longest polygonal chain"
+                    +"Geometric puzzle of different levels"
                 }
             }
             styledDiv {
                 css {
                     display = Display.flex
-                    justifyContent = JustifyContent.center
-                    margin(50.px)
+                    flexWrap = FlexWrap.wrap
+                    margin(0.px, LinearDimension.auto)
+                    maxWidth = 700.px
                 }
                 for ((size, ruleSet) in props.fieldProps) {
                     styledButton {
                         css {
-                            +CommonStyles.myButton
+                            +MainPageStyles.tile
                             +ruleSet
-                            margin(30.px)
-                            height = 250.px
-                            width = 350.px
-                            fontSize = 50.px
                         }
                         attrs {
                             onClickFunction = {
-                                props.setPage(Pages.GAME_PAGE)
+                                props.showPageFunc(Pages.GAME_PAGE)
                             }
                         }
                         +"$size x $size"
                     }
+                }
+                styledButton {
+                    css {
+                        +MainPageStyles.tile
+                        +CommonStyles.greyButton
+                    }
+                    attrs {
+                        onClickFunction = {
+
+                        }
+                    }
+                    +"Other"
                 }
             }
         }
