@@ -7,6 +7,7 @@ enum class Pages {
 
 external interface AppState: RState {
     var page: Pages
+    var fieldSize: Int
 }
 
 class App : RComponent<RProps, AppState>() {
@@ -20,12 +21,19 @@ class App : RComponent<RProps, AppState>() {
         }
     }
 
+    private fun showGamePage(newFieldSize: Int) {
+        setState {
+            page = Pages.GAME_PAGE
+            fieldSize = newFieldSize
+        }
+    }
+
     override fun RBuilder.render() {
         when (state.page) {
             Pages.MAIN_PAGE -> child(MainPage::class) {
                 attrs {
-                    showPageFunc = {
-                        page -> showPage(page)
+                    showGamePageFunc = {
+                        fieldSize -> showGamePage(fieldSize)
                     }
                     fieldProps = listOf(
                         6 to CommonStyles.greenButton,
@@ -37,8 +45,11 @@ class App : RComponent<RProps, AppState>() {
                 }
             }
             Pages.GAME_PAGE -> child(GamePage::class) {
-                attrs.showPageFunc = {
-                    page -> showPage(page)
+                attrs {
+                    showPageFunc = {
+                        page -> showPage(page)
+                    }
+                    fieldSize = state.fieldSize
                 }
             }
         }

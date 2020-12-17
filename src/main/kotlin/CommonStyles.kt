@@ -3,6 +3,11 @@ import kotlinx.css.properties.*
 import styled.StyleSheet
 
 object CommonStyles: StyleSheet("CommonStyles", isStatic = true) {
+    val container by css {
+        display = Display.flex
+        flexGrow = 1.0
+        flexDirection = FlexDirection.column
+    }
     val greenButton by css {
         color = Color.black
         backgroundColor = Color.lightGreen
@@ -63,6 +68,16 @@ object CommonStyles: StyleSheet("CommonStyles", isStatic = true) {
             backgroundColor = Color.darkGrey
         }
     }
+    val transparentButton by css {
+        color = Color.black
+        backgroundColor = Color.transparent
+        hover {
+            backgroundColor = Color.lightGrey
+        }
+        active {
+            backgroundColor = Color.darkGrey
+        }
+    }
     val myButton by css {
         fontFamily = "inherit"
         border(1.px, BorderStyle.solid, rgba(0, 0, 0, 0.1))
@@ -70,5 +85,13 @@ object CommonStyles: StyleSheet("CommonStyles", isStatic = true) {
         hover {
             boxShadow(Color.lightGrey, 2.px, 2.px, 10.px)
         }
+    }
+    val linkButton by css {
+        background = "none"
+        border = "none"
+        padding = "0"
+        color = rgb(0,102,153)
+        textDecoration = TextDecoration(setOf(TextDecorationLine.underline))
+        cursor = Cursor.pointer
     }
 }

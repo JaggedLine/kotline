@@ -5,9 +5,32 @@
     <title>KotlinLine</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/5434d58d99.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <div id="root" style="font-family: 'Open Sans', sans-serif;"></div>
+    <div id="root" style=""></div>
     <script src="KotlinLine.js"></script>
 </body>
 </html>
+
+<style>
+    *, *::after, *::before {
+        box-sizing: border-box;
+    }
+
+    html {
+        min-height: 100%;
+        display: flex;
+    }
+
+    body {
+        flex: 1;
+        margin: 0;
+        font-family: 'Open Sans', sans-serif;
+    }
+
+    #root {
+        display: flex;
+        height: 100%;
+    }
+</style>

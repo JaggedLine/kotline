@@ -5,7 +5,7 @@ import styled.*
 import styled.css
 
 external interface MainPageProps: RProps {
-    var showPageFunc: (Pages) -> Unit
+    var showGamePageFunc: (Int) -> Unit
     var fieldProps: List<Pair<Int, RuleSet>>
 }
 
@@ -13,8 +13,7 @@ class MainPage: RComponent<MainPageProps, RState>() {
     override fun RBuilder.render() {
         styledDiv {
             css {
-                display = Display.flex
-                flexDirection = FlexDirection.column
+                +CommonStyles.container
             }
             styledDiv {
                 css {
@@ -51,7 +50,7 @@ class MainPage: RComponent<MainPageProps, RState>() {
                         }
                         attrs {
                             onClickFunction = {
-                                props.showPageFunc(Pages.GAME_PAGE)
+                                props.showGamePageFunc(size)
                             }
                         }
                         +"$size x $size"

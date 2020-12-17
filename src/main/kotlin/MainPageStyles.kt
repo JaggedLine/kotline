@@ -9,5 +9,6 @@ object MainPageStyles: StyleSheet("MainPageStyles", isStatic = true) {
         minWidth = 200.px
         margin(10.px)
         fontSize = 40.px
+        flexBasis = FlexBasis("0")
     }
 }
