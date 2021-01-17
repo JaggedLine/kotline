@@ -1,72 +1,64 @@
 import kotlinx.css.*
-import kotlinx.html.js.onClickFunction
+import kotlinx.html.*
+import kotlinx.html.js.*
 import react.*
 import styled.*
-import styled.css
 
-external interface MainPageProps: RProps {
-    var showGamePageFunc: (Int) -> Unit
-    var fieldProps: List<Pair<Int, RuleSet>>
+external interface MainPageProps : RProps {
+    var showGamePageFunc: () -> Unit
+    var showRulesPopupFunc: () -> Unit
 }
 
-class MainPage: RComponent<MainPageProps, RState>() {
+class MainPage : RComponent<MainPageProps, RState>() {
     override fun RBuilder.render() {
         styledDiv {
             css {
                 +CommonStyles.container
+                +MainPageStyles.container
             }
             styledDiv {
-                css {
-                    margin(50.px)
-                    textAlign = TextAlign.center
-                }
-                styledH1 {
-                    css {
-                        color = Color.black
-                        fontSize = 50.px
-                    }
-                    +"Jagged line"
-                }
+                css { +MainPageStyles.content }
                 styledH2 {
-                    css {
-                        color = Color.grey
-                        fontSize = 30.px
-                    }
+                    css { +MainPageStyles.gameTitle }
                     +"Geometric puzzle of different levels"
                 }
-            }
-            styledDiv {
-                css {
-                    display = Display.flex
-                    flexWrap = FlexWrap.wrap
-                    margin(0.px, LinearDimension.auto)
-                    maxWidth = 700.px
+                styledP {
+                    css { +MainPageStyles.gameParagraph }
+                    +"""Construct the longest non-self-intersecting polyline
+                        |whose vertices are nodes of the grid and the length of each edge
+                        |is a knight move. Try to get the highest score!""".trimMargin()
                 }
-                for ((size, ruleSet) in props.fieldProps) {
+                styledDiv {
+                    css { +MainPageStyles.actions }
                     styledButton {
                         css {
-                            +MainPageStyles.tile
-                            +ruleSet
+                            +CommonStyles.myButton
+                            +CommonStyles.darkGreenButton
+                            +MainPageStyles.playButton
+                        }
+                        +"Play now"
+                        styledSpan {
+                            css {
+                                marginLeft = 15.px
+                            }
+                            attrs {
+                                classes = setOf("fas", "fa-chevron-right")
+                            }
                         }
                         attrs {
                             onClickFunction = {
-                                props.showGamePageFunc(size)
+                                props.showGamePageFunc()
                             }
                         }
-                        +"$size x $size"
                     }
-                }
-                styledButton {
-                    css {
-                        +MainPageStyles.tile
-                        +CommonStyles.greyButton
-                    }
-                    attrs {
-                        onClickFunction = {
-
+                    styledButton {
+                        css {
+                            +CommonStyles.flatButton
+                            +CommonStyles.hoverUnderlineButton
+                            +MainPageStyles.rulesButton
                         }
+                        +"View rules"
                     }
-                    +"Other"
                 }
             }
         }
