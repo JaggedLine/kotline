@@ -7,6 +7,10 @@ import kotlin.math.*
 
 data class Point(val x: Int, val y: Int)
 
+operator fun Point.minus(other: Point): Point {
+    return Point(this.x - other.x, this.y - other.y)
+}
+
 external interface ChainFieldProps : RProps {
     var sizeX: Int
     var sizeY: Int
@@ -34,19 +38,58 @@ external interface ChainFieldProps : RProps {
     var endNodeColor: Color
 
     var deleteColor: Color
+
+    var updateSubmitButton: (String, Boolean) -> Unit
 }
 
 external interface ChainFieldState : RState {
-    var points: MutableList<Point>
-    var busy: Boolean
+    var polyline: MutableList<Point>
     var coveredNode: Point?
 }
 
 class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFieldState>() {
     init {
-        state.points = mutableListOf(props.startPoint)
-        state.busy = false
+        state.polyline = mutableListOf(props.startPoint)
         state.coveredNode = null
+    }
+
+    private fun isKnightMove(from: Point, to: Point): Boolean {
+        return to - from in setOf(
+            Point(1, 2), Point(1, -2), Point(-1, 2), Point(-1, -2),
+            Point(2, 1), Point(2, -1), Point(-2, 1), Point(-2, -1)
+        )
+    }
+
+    private fun crossProduct(a: Point, b: Point): Int {
+        return a.x * b.y - a.y * b.x
+    }
+
+    private fun segmentsIntersect(a: Point, b: Point, c: Point, d: Point): Boolean {
+        val prod1 = crossProduct(b - a, c - a)
+        val prod2 = crossProduct(b - a, d - a)
+        val prod3 = crossProduct(d - c, a - c)
+        val prod4 = crossProduct(d - c, b - c)
+        val prod12 = prod1 * prod2
+        val prod34 = prod3 * prod4
+        if (prod12 > 0 || prod34 > 0) {
+            return false
+        }
+        if (prod12 < 0 && prod34 < 0) {
+            return true
+        }
+        return false
+    }
+
+    private fun canAdd(next: Point): Boolean {
+        if (!isKnightMove(state.polyline.last(), next)) {
+            return false
+        }
+        for (i in 0 until state.polyline.size - 1) {
+            if (segmentsIntersect(state.polyline[i], state.polyline[i + 1], state.polyline.last(), next)) {
+                return false
+            }
+        }
+        return true
     }
 
     override fun RBuilder.render() {
@@ -84,18 +127,18 @@ class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFiel
                     }
                 }
             }
-            for (i in 0 until state.points.size - 1) {
-                val x1 = state.points[i].x * props.gridStep
-                val y1 = state.points[i].y * props.gridStep
-                val x2 = state.points[i + 1].x * props.gridStep
-                val y2 = state.points[i + 1].y * props.gridStep
+            for (i in 0 until state.polyline.size - 1) {
+                val x1 = state.polyline[i].x * props.gridStep
+                val y1 = state.polyline[i].y * props.gridStep
+                val x2 = state.polyline[i + 1].x * props.gridStep
+                val y2 = state.polyline[i + 1].y * props.gridStep
                 val xc = (x1 + x2) / 2
                 val yc = (y1 + y2) / 2
                 val angle = -atan2((y2 - y1) * 1.0, (x2 - x1) * 1.0) * 180 / PI
                 val len = sqrt((x2 - x1) * (x2 - x1) * 1.0 + (y2 - y1) * (y2 - y1) * 1.0) +
                         props.segmentWidth
-                val toDelete = state.coveredNode in state.points &&
-                        state.points.indexOf(state.coveredNode) <= i
+                val toDelete = state.coveredNode in state.polyline &&
+                        state.polyline.indexOf(state.coveredNode) <= i
                 styledDiv {
                     css {
                         position = Position.absolute
@@ -116,10 +159,10 @@ class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFiel
                 for (j in 0 until props.sizeY) {
                     val curPoint = Point(i, j)
                     val isCovered = curPoint == state.coveredNode
-                    val isUsed = curPoint in state.points
-                    val toDelete = state.coveredNode in state.points && isUsed &&
-                            state.points.indexOf(state.coveredNode) <=
-                            state.points.indexOf(curPoint)
+                    val isUsed = curPoint in state.polyline
+                    val toDelete = state.coveredNode in state.polyline && isUsed &&
+                            state.polyline.indexOf(state.coveredNode) <
+                            state.polyline.indexOf(curPoint)
                     styledDiv {
                         css {
                             position = Position.absolute
@@ -130,9 +173,9 @@ class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFiel
                             backgroundColor = when {
                                 curPoint == props.startPoint -> props.startNodeColor
                                 curPoint == props.endPoint -> props.endNodeColor
-                                toDelete -> props.deleteColor
                                 isCovered && !isUsed -> props.hoverNodeColor
-                                !isCovered && isUsed -> props.usedNodeColor
+                                !toDelete && isUsed -> props.usedNodeColor
+                                toDelete -> props.deleteColor
                                 else -> props.nodeColor
                             }
                             border = when {
@@ -146,6 +189,7 @@ class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFiel
             }
             for (i in 0 until props.sizeX) {
                 for (j in 0 until props.sizeY) {
+                    val curPoint = Point(i, j)
                     styledDiv {
                         css {
                             position = Position.absolute
@@ -157,10 +201,8 @@ class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFiel
                         }
                         attrs {
                             onMouseOverFunction = {
-                                if (!state.busy) {
-                                    setState {
-                                        coveredNode = Point(i, j)
-                                    }
+                                setState {
+                                    coveredNode = curPoint
                                 }
                             }
                             onMouseOutFunction = {
@@ -170,7 +212,24 @@ class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFiel
                             }
                             onClickFunction = {
                                 setState {
-                                    state.points.add(Point(i, j))
+                                    if (curPoint in polyline) {
+                                        while (polyline.last() != curPoint) {
+                                            polyline.removeLast()
+                                        }
+                                    } else if (canAdd(curPoint)) {
+                                        polyline.add(curPoint)
+                                    }
+                                    if (polyline.last() == props.endPoint) {
+                                        props.updateSubmitButton(
+                                            "Submit score ${polyline.size - 1}!",
+                                            true
+                                        )
+                                    } else {
+                                        props.updateSubmitButton(
+                                            "Your score is ${polyline.size - 1}.",
+                                            false
+                                        )
+                                    }
                                 }
                             }
                         }

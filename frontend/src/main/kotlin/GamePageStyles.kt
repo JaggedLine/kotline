@@ -14,6 +14,7 @@ object GamePageStyles : StyleSheet("GamePageStyles", isStatic = true) {
         flexShrink = 0.0
         flexBasis = FlexBasis("400px")
         minHeight = 400.px
+        padding(40.px)
         backgroundColor = rgb(237, 255, 250)
     }
     val rightContainer by css {
@@ -38,7 +39,7 @@ object GamePageStyles : StyleSheet("GamePageStyles", isStatic = true) {
         fontStyle = FontStyle.italic
     }
     val nameInput by css {
-        marginTop = 20.px
+        marginTop = 30.px
         width = 100.pct
         fontSize = 1.em
         textAlign = TextAlign.center
