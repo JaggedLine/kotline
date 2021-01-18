@@ -9,9 +9,11 @@ object GamePageStyles : StyleSheet("GamePageStyles", isStatic = true) {
         fontSize = 25.px
     }
     val fieldContainer by css {
+        display = Display.flex
         flexGrow = 10.0
         flexShrink = 0.0
         flexBasis = FlexBasis("400px")
+        minHeight = 400.px
         backgroundColor = rgb(237, 255, 250)
     }
     val rightContainer by css {
@@ -26,7 +28,6 @@ object GamePageStyles : StyleSheet("GamePageStyles", isStatic = true) {
     val sizeRow by css {
         display = Display.flex
         flexDirection = FlexDirection.row
-        marginBottom = 10.px
     }
     val sizeTitle by css {
         margin(0.px, LinearDimension.auto, 0.px, 0.px)
@@ -36,12 +37,11 @@ object GamePageStyles : StyleSheet("GamePageStyles", isStatic = true) {
         margin(0.px)
         fontStyle = FontStyle.italic
     }
-    val scoreRow = sizeRow
-    val scoreTitle = sizeTitle
-    val scoreValue = sizeValue
     val nameInput by css {
         marginTop = 20.px
+        width = 100.pct
         fontSize = 1.em
+        textAlign = TextAlign.center
     }
     val submitButton by css {
         marginTop = 20.px

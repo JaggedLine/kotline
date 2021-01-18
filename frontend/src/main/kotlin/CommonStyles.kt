@@ -18,6 +18,10 @@ object CommonStyles : StyleSheet("CommonStyles", isStatic = true) {
         lineHeight = LineHeight("1.5em")
         textDecoration = TextDecoration.none
         cursor = Cursor.pointer
+        outline = Outline.none
+        disabled {
+            cursor = Cursor.default
+        }
     }
     val flatButton by css {
         background = "none"
@@ -25,6 +29,7 @@ object CommonStyles : StyleSheet("CommonStyles", isStatic = true) {
         padding = "0"
         fontFamily = "inherit"
         cursor = Cursor.pointer
+        outline = Outline.none
     }
     val hoverUnderlineButton by css {
         hover {
@@ -39,6 +44,23 @@ object CommonStyles : StyleSheet("CommonStyles", isStatic = true) {
         }
         active {
             backgroundColor = rgb(48, 86, 88)
+        }
+        disabled {
+            color = Color.black
+            backgroundColor = rgb(190, 213, 210)
+        }
+    }
+    val myInput by css {
+        padding(0.1.em, 0.em)
+        minWidth = 0.px
+        backgroundColor = Color.transparent
+        border = "none"
+        borderBottom = "1px solid grey"
+        fontFamily = "inherit"
+        lineHeight = LineHeight("1.5em")
+        outline = Outline.none
+        focus {
+            borderColor = Color.darkGreen
         }
     }
 }

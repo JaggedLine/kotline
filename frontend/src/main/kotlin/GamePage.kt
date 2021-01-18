@@ -1,4 +1,6 @@
+import kotlinx.css.*
 import react.*
+import react.dom.*
 import styled.*
 
 class GamePage : RComponent<RProps, RState>() {
@@ -12,6 +14,36 @@ class GamePage : RComponent<RProps, RState>() {
                 }
                 styledDiv {
                     css { +GamePageStyles.fieldContainer }
+                    child(ChainField::class) {
+                        attrs {
+                            sizeX = 5
+                            sizeY = 6
+                            startPoint = Point(0, 0)
+                            endPoint = Point(4, 5)
+
+                            backgroundColor = Color.transparent
+
+                            showGrid = true
+                            gridColor = rgb(48, 86, 88)
+                            gridWidth = 3
+                            gridStep = 80
+
+                            segmentWidth = 5
+                            segmentColor = Color.black
+
+                            nodeRadius = 8
+                            clickableNodeRadius = 15
+                            nodeColor = Color.transparent
+                            hoverNodeColor = Color.grey
+                            usedNodeColor = Color.white
+                            usedNodeBorderColor = Color.black
+                            usedNodeBorderWidth = 4
+                            startNodeColor = Color.black
+                            endNodeColor = Color.black
+
+                            deleteColor = rgba(255, 127, 127, 0.9)
+                        }
+                    }
                 }
                 styledDiv {
                     css { +GamePageStyles.rightContainer }
@@ -26,23 +58,15 @@ class GamePage : RComponent<RProps, RState>() {
                             +"6 x 6"
                         }
                     }
-                    styledDiv {
-                        css { +GamePageStyles.scoreRow }
-                        styledH3 {
-                            css { +GamePageStyles.scoreTitle }
-                            +"Your score:"
-                        }
-                        styledH3 {
-                            css { +GamePageStyles.scoreValue }
-                            +"10"
-                        }
-                    }
-                    styledInput {
-                        css {
-                            +GamePageStyles.nameInput
-                        }
-                        attrs {
-                            placeholder = "Enter your name"
+                    label {
+                        styledInput {
+                            css {
+                                +CommonStyles.myInput
+                                +GamePageStyles.nameInput
+                            }
+                            attrs {
+                                placeholder = "Enter your name"
+                            }
                         }
                     }
                     styledButton {
@@ -51,7 +75,10 @@ class GamePage : RComponent<RProps, RState>() {
                             +CommonStyles.darkGreenButton
                             +GamePageStyles.submitButton
                         }
-                        +"Submit"
+//                        attrs {
+//                            disabled = true
+//                        }
+                        +"Submit score 2!"
                     }
                 }
             }
