@@ -7,10 +7,13 @@ import io.ktor.routing.*
 fun Route.submit() {
     route("/submit") {
         post {
-            println("here")
             val claim = call.receive<Claim>()
-            println("fieldSize: ${claim.field.size.rows}x${claim.field.size.columns}")
-            call.respondText("The result has been received", status = HttpStatusCode.Accepted)
+            val isGood = database.insert(claim)
+            if (isGood.first) {
+                call.respondText("The result has been received", status = HttpStatusCode.Accepted)
+            } else {
+                call.respondText("The result was not admitted, reason: ${isGood.second}", status = HttpStatusCode.NotAcceptable)
+            }
         }
     }
 }
