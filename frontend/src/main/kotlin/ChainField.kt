@@ -5,17 +5,39 @@ import react.*
 import styled.*
 import kotlin.math.*
 
-data class Point(val x: Int, val y: Int)
-
 operator fun Point.minus(other: Point): Point {
     return Point(this.x - other.x, this.y - other.y)
 }
 
+private fun isKnightMove(from: Point, to: Point): Boolean {
+    return to - from in setOf(
+        Point(1, 2), Point(1, -2), Point(-1, 2), Point(-1, -2),
+        Point(2, 1), Point(2, -1), Point(-2, 1), Point(-2, -1)
+    )
+}
+
+private fun crossProduct(a: Point, b: Point): Int {
+    return a.x * b.y - a.y * b.x
+}
+
+private fun segmentsIntersect(a: Point, b: Point, c: Point, d: Point): Boolean {
+    val prod1 = crossProduct(b - a, c - a)
+    val prod2 = crossProduct(b - a, d - a)
+    val prod3 = crossProduct(d - c, a - c)
+    val prod4 = crossProduct(d - c, b - c)
+    val prod12 = prod1 * prod2
+    val prod34 = prod3 * prod4
+    if (prod12 > 0 || prod34 > 0) {
+        return false
+    }
+    if (prod12 < 0 && prod34 < 0) {
+        return true
+    }
+    return false
+}
+
 external interface ChainFieldProps : RProps {
-    var sizeX: Int
-    var sizeY: Int
-    var startPoint: Point
-    var endPoint: Point
+    var field: Field
 
     var backgroundColor: Color
 
@@ -49,35 +71,8 @@ external interface ChainFieldState : RState {
 
 class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFieldState>() {
     init {
-        state.polyline = mutableListOf(props.startPoint)
+        state.polyline = mutableListOf(props.field.startPoint)
         state.coveredNode = null
-    }
-
-    private fun isKnightMove(from: Point, to: Point): Boolean {
-        return to - from in setOf(
-            Point(1, 2), Point(1, -2), Point(-1, 2), Point(-1, -2),
-            Point(2, 1), Point(2, -1), Point(-2, 1), Point(-2, -1)
-        )
-    }
-
-    private fun crossProduct(a: Point, b: Point): Int {
-        return a.x * b.y - a.y * b.x
-    }
-
-    private fun segmentsIntersect(a: Point, b: Point, c: Point, d: Point): Boolean {
-        val prod1 = crossProduct(b - a, c - a)
-        val prod2 = crossProduct(b - a, d - a)
-        val prod3 = crossProduct(d - c, a - c)
-        val prod4 = crossProduct(d - c, b - c)
-        val prod12 = prod1 * prod2
-        val prod34 = prod3 * prod4
-        if (prod12 > 0 || prod34 > 0) {
-            return false
-        }
-        if (prod12 < 0 && prod34 < 0) {
-            return true
-        }
-        return false
     }
 
     private fun canAdd(next: Point): Boolean {
@@ -97,30 +92,30 @@ class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFiel
             css {
                 position = Position.relative
                 margin(LinearDimension.auto)
-                height = (props.gridStep * (props.sizeX - 1) + props.nodeRadius * 2).px
-                width = (props.gridStep * (props.sizeY - 1) + props.nodeRadius * 2).px
+                height = (props.gridStep * (props.field.sizeX - 1) + props.nodeRadius * 2).px
+                width = (props.gridStep * (props.field.sizeY - 1) + props.nodeRadius * 2).px
                 backgroundColor = props.backgroundColor
             }
             if (props.showGrid) {
-                for (i in 0 until props.sizeX) {
+                for (i in 0 until props.field.sizeX) {
                     styledDiv {
                         css {
                             position = Position.absolute
                             top = (i * props.gridStep + props.nodeRadius - props.gridWidth / 2).px
                             left = (props.nodeRadius - props.gridWidth / 2).px
                             height = props.gridWidth.px
-                            width = ((props.sizeY - 1) * props.gridStep + props.gridWidth).px
+                            width = ((props.field.sizeY - 1) * props.gridStep + props.gridWidth).px
                             backgroundColor = props.gridColor
                         }
                     }
                 }
-                for (j in 0 until props.sizeY) {
+                for (j in 0 until props.field.sizeY) {
                     styledDiv {
                         css {
                             position = Position.absolute
                             top = (props.nodeRadius - props.gridWidth / 2).px
                             left = (j * props.gridStep + props.nodeRadius - props.gridWidth / 2).px
-                            height = ((props.sizeX - 1) * props.gridStep + props.gridWidth).px
+                            height = ((props.field.sizeX - 1) * props.gridStep + props.gridWidth).px
                             width = props.gridWidth.px
                             backgroundColor = props.gridColor
                         }
@@ -155,8 +150,8 @@ class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFiel
                     }
                 }
             }
-            for (i in 0 until props.sizeX) {
-                for (j in 0 until props.sizeY) {
+            for (i in 0 until props.field.sizeX) {
+                for (j in 0 until props.field.sizeY) {
                     val curPoint = Point(i, j)
                     val isCovered = curPoint == state.coveredNode
                     val isUsed = curPoint in state.polyline
@@ -171,8 +166,8 @@ class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFiel
                             height = (props.nodeRadius * 2).px
                             width = (props.nodeRadius * 2).px
                             backgroundColor = when {
-                                curPoint == props.startPoint -> props.startNodeColor
-                                curPoint == props.endPoint -> props.endNodeColor
+                                curPoint == props.field.startPoint -> props.startNodeColor
+                                curPoint == props.field.endPoint -> props.endNodeColor
                                 isCovered && !isUsed -> props.hoverNodeColor
                                 !toDelete && isUsed -> props.usedNodeColor
                                 toDelete -> props.deleteColor
@@ -187,8 +182,8 @@ class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFiel
                     }
                 }
             }
-            for (i in 0 until props.sizeX) {
-                for (j in 0 until props.sizeY) {
+            for (i in 0 until props.field.sizeX) {
+                for (j in 0 until props.field.sizeY) {
                     val curPoint = Point(i, j)
                     styledDiv {
                         css {
@@ -219,7 +214,7 @@ class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFiel
                                     } else if (canAdd(curPoint)) {
                                         polyline.add(curPoint)
                                     }
-                                    if (polyline.last() == props.endPoint) {
+                                    if (polyline.last() == props.field.endPoint) {
                                         props.updateSubmitButton(
                                             "Submit score ${polyline.size - 1}!",
                                             true

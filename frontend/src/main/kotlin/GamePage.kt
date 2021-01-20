@@ -1,15 +1,26 @@
 import kotlinx.css.*
+import kotlinx.html.js.*
 import react.*
 import react.dom.*
 import styled.*
 
+data class Point(val x: Int, val y: Int)
+
+data class Field(var sizeX: Int, var sizeY: Int, var startPoint: Point, var endPoint: Point)
+
+external interface GamePageProps : RProps {
+    var fieldOptions: List<Field>
+}
+
 external interface GamePageState : RState {
+    var field: Field
     var submitStr: String
     var submitEnabled: Boolean
 }
 
-class GamePage : RComponent<RProps, GamePageState>() {
+class GamePage(props: GamePageProps) : RComponent<GamePageProps, GamePageState>() {
     init {
+        state.field = props.fieldOptions.first()
         state.submitStr = "Your score is 0."
         state.submitEnabled = false
     }
@@ -51,10 +62,7 @@ class GamePage : RComponent<RProps, GamePageState>() {
                     child(ChainField::class) {
                         attrs {
                             chainFieldStyle()
-                            sizeX = 5
-                            sizeY = 6
-                            startPoint = Point(0, 0)
-                            endPoint = Point(4, 5)
+                            field = state.field
                             updateSubmitButton = { str, enabled ->
                                 setState {
                                     submitStr = str
@@ -72,9 +80,20 @@ class GamePage : RComponent<RProps, GamePageState>() {
                             css { +GamePageStyles.sizeTitle }
                             +"Field size:"
                         }
-                        styledH3 {
-                            css { +GamePageStyles.sizeValue }
-                            +"6 x 6"
+                        styledSelect {
+                            css {
+
+                            }
+                            attrs {
+                                onChangeFunction = {
+                                    console.log(it.target)
+                                }
+                            }
+                            for (fieldOption in props.fieldOptions) {
+                                option {
+                                    +"${fieldOption.sizeX} x ${fieldOption.sizeY}"
+                                }
+                            }
                         }
                     }
                     label {

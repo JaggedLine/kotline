@@ -34,10 +34,10 @@ object GamePageStyles : StyleSheet("GamePageStyles", isStatic = true) {
         margin(0.px, LinearDimension.auto, 0.px, 0.px)
         fontWeight = FontWeight.normal
     }
-    val sizeValue by css {
-        margin(0.px)
-        fontStyle = FontStyle.italic
-    }
+//    val sizeValue by css {
+//        margin(0.px)
+//        fontStyle = FontStyle.italic
+//    }
     val nameInput by css {
         marginTop = 30.px
         width = 100.pct
