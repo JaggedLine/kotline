@@ -1,52 +1,29 @@
-import kotlinx.css.*
 import kotlinx.html.js.*
+import org.w3c.dom.*
 import react.*
 import react.dom.*
 import styled.*
 
-data class Point(val x: Int, val y: Int)
-
-data class Field(var sizeX: Int, var sizeY: Int, var startPoint: Point, var endPoint: Point)
-
-external interface GamePageProps : RProps {
-    var fieldOptions: List<Field>
-}
-
 external interface GamePageState : RState {
-    var field: Field
-    var submitStr: String
-    var submitEnabled: Boolean
+    var chainFieldRef: RReadableRef<ChainField>
+    var fieldList: List<Field>
+    var currentField: Field
+    var won: Boolean
+    var score: Int
 }
 
-class GamePage(props: GamePageProps) : RComponent<GamePageProps, GamePageState>() {
+class GamePage : RComponent<RProps, GamePageState>() {
     init {
-        state.field = props.fieldOptions.first()
-        state.submitStr = "Your score is 0."
-        state.submitEnabled = false
-    }
-
-    private fun ChainFieldProps.chainFieldStyle() {
-        backgroundColor = Color.transparent
-
-        showGrid = true
-        gridColor = rgb(48, 86, 88)
-        gridWidth = 3
-        gridStep = 80
-
-        segmentWidth = 5
-        segmentColor = Color.black
-
-        nodeRadius = 8
-        clickableNodeRadius = 15
-        nodeColor = Color.transparent
-        hoverNodeColor = Color.grey
-        usedNodeColor = Color.white
-        usedNodeBorderColor = Color.black
-        usedNodeBorderWidth = 4
-        startNodeColor = Color.black
-        endNodeColor = Color.black
-
-        deleteColor = rgba(255, 127, 127, 0.9)
+        state.chainFieldRef = createRef()
+        state.fieldList = listOf(
+            Field(sizeX = 6, sizeY = 6, startPoint = Point(3, 3), endPoint = Point(5, 4)),
+            Field(sizeX = 7, sizeY = 7, startPoint = Point(3, 3), endPoint = Point(6, 4)),
+            Field(sizeX = 8, sizeY = 8, startPoint = Point(3, 3), endPoint = Point(6, 4)),
+            Field(sizeX = 10, sizeY = 10, startPoint = Point(3, 3), endPoint = Point(6, 4))
+        ) // TODO: fetch
+        state.currentField = state.fieldList.first()
+        state.won = false
+        state.score = 0
     }
 
     override fun RBuilder.render() {
@@ -61,15 +38,16 @@ class GamePage(props: GamePageProps) : RComponent<GamePageProps, GamePageState>(
                     css { +GamePageStyles.fieldContainer }
                     child(ChainField::class) {
                         attrs {
-                            chainFieldStyle()
-                            field = state.field
-                            updateSubmitButton = { str, enabled ->
+                            field = state.currentField
+                            onPolylineChange = { polyline ->
                                 setState {
-                                    submitStr = str
-                                    submitEnabled = enabled
+                                    won = polyline.last() == field.endPoint
+                                    score = polyline.size - 1
                                 }
                             }
+                            chainFieldStyle()
                         }
+                        ref = state.chainFieldRef
                     }
                 }
                 styledDiv {
@@ -86,12 +64,19 @@ class GamePage(props: GamePageProps) : RComponent<GamePageProps, GamePageState>(
                             }
                             attrs {
                                 onChangeFunction = {
-                                    console.log(it.target)
+                                    val index = (it.target as HTMLSelectElement).value.toInt()
+                                    setState {
+                                        currentField = fieldList[index]
+                                        chainFieldRef.current?.clearPolyline()
+                                    }
                                 }
                             }
-                            for (fieldOption in props.fieldOptions) {
+                            state.fieldList.forEachIndexed { index, field ->
                                 option {
-                                    +"${fieldOption.sizeX} x ${fieldOption.sizeY}"
+                                    attrs {
+                                        value = "$index"
+                                    }
+                                    +"${field.sizeX} x ${field.sizeY}"
                                 }
                             }
                         }
@@ -114,9 +99,13 @@ class GamePage(props: GamePageProps) : RComponent<GamePageProps, GamePageState>(
                             +GamePageStyles.submitButton
                         }
                         attrs {
-                            disabled = !state.submitEnabled
+                            disabled = !state.won
                         }
-                        +state.submitStr
+                        if (state.won) {
+                            +"Submit score ${state.score}!"
+                        } else {
+                            +"Your score is ${state.score}."
+                        }
                     }
                 }
             }

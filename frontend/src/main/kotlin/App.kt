@@ -42,16 +42,7 @@ class App : RComponent<RProps, AppState>() {
                     }
                 }
             }
-            Pages.GAME_PAGE -> child(GamePage::class) {
-                attrs {
-                    fieldOptions = listOf(
-                        Field(sizeX = 6, sizeY = 6, startPoint = Point(3, 3), endPoint = Point(5, 4)),
-                        Field(sizeX = 7, sizeY = 7, startPoint = Point(3, 3), endPoint = Point(6, 4)),
-                        Field(sizeX = 8, sizeY = 8, startPoint = Point(3, 3), endPoint = Point(6, 4)),
-                        Field(sizeX = 10, sizeY = 10, startPoint = Point(3, 3), endPoint = Point(6, 4))
-                    )
-                }
-            }
+            Pages.GAME_PAGE -> child(GamePage::class) {}
         }
     }
 }

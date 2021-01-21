@@ -5,39 +5,9 @@ import react.*
 import styled.*
 import kotlin.math.*
 
-operator fun Point.minus(other: Point): Point {
-    return Point(this.x - other.x, this.y - other.y)
-}
-
-private fun isKnightMove(from: Point, to: Point): Boolean {
-    return to - from in setOf(
-        Point(1, 2), Point(1, -2), Point(-1, 2), Point(-1, -2),
-        Point(2, 1), Point(2, -1), Point(-2, 1), Point(-2, -1)
-    )
-}
-
-private fun crossProduct(a: Point, b: Point): Int {
-    return a.x * b.y - a.y * b.x
-}
-
-private fun segmentsIntersect(a: Point, b: Point, c: Point, d: Point): Boolean {
-    val prod1 = crossProduct(b - a, c - a)
-    val prod2 = crossProduct(b - a, d - a)
-    val prod3 = crossProduct(d - c, a - c)
-    val prod4 = crossProduct(d - c, b - c)
-    val prod12 = prod1 * prod2
-    val prod34 = prod3 * prod4
-    if (prod12 > 0 || prod34 > 0) {
-        return false
-    }
-    if (prod12 < 0 && prod34 < 0) {
-        return true
-    }
-    return false
-}
-
 external interface ChainFieldProps : RProps {
     var field: Field
+    var onPolylineChange: (List<Point>) -> Unit
 
     var backgroundColor: Color
 
@@ -60,8 +30,6 @@ external interface ChainFieldProps : RProps {
     var endNodeColor: Color
 
     var deleteColor: Color
-
-    var updateSubmitButton: (String, Boolean) -> Unit
 }
 
 external interface ChainFieldState : RState {
@@ -75,16 +43,11 @@ class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFiel
         state.coveredNode = null
     }
 
-    private fun canAdd(next: Point): Boolean {
-        if (!isKnightMove(state.polyline.last(), next)) {
-            return false
+    fun clearPolyline() {
+        setState {
+            polyline = mutableListOf(props.field.startPoint)
+            props.onPolylineChange(polyline)
         }
-        for (i in 0 until state.polyline.size - 1) {
-            if (segmentsIntersect(state.polyline[i], state.polyline[i + 1], state.polyline.last(), next)) {
-                return false
-            }
-        }
-        return true
     }
 
     override fun RBuilder.render() {
@@ -211,20 +174,10 @@ class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFiel
                                         while (polyline.last() != curPoint) {
                                             polyline.removeLast()
                                         }
-                                    } else if (canAdd(curPoint)) {
+                                    } else if (isPolylineValid(polyline + curPoint, props.field)) {
                                         polyline.add(curPoint)
                                     }
-                                    if (polyline.last() == props.field.endPoint) {
-                                        props.updateSubmitButton(
-                                            "Submit score ${polyline.size - 1}!",
-                                            true
-                                        )
-                                    } else {
-                                        props.updateSubmitButton(
-                                            "Your score is ${polyline.size - 1}.",
-                                            false
-                                        )
-                                    }
+                                    props.onPolylineChange(polyline)
                                 }
                             }
                         }
