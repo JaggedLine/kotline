@@ -1,11 +1,15 @@
+import kotlinx.browser.*
+import kotlinx.html.*
 import kotlinx.html.js.*
 import org.w3c.dom.*
+import org.w3c.fetch.*
 import react.*
 import react.dom.*
 import styled.*
 
 external interface GamePageState : RState {
     var chainFieldRef: RReadableRef<ChainField>
+    var resultsTableRef: RReadableRef<ResultsTable>
     var fieldList: List<Field>
     var currentField: Field
     var won: Boolean
@@ -15,15 +19,26 @@ external interface GamePageState : RState {
 class GamePage : RComponent<RProps, GamePageState>() {
     init {
         state.chainFieldRef = createRef()
+        state.resultsTableRef = createRef()
         state.fieldList = listOf(
             Field(sizeX = 6, sizeY = 6, startPoint = Point(3, 3), endPoint = Point(5, 4)),
-            Field(sizeX = 7, sizeY = 7, startPoint = Point(3, 3), endPoint = Point(6, 4)),
-            Field(sizeX = 8, sizeY = 8, startPoint = Point(3, 3), endPoint = Point(6, 4)),
-            Field(sizeX = 10, sizeY = 10, startPoint = Point(3, 3), endPoint = Point(6, 4))
+            Field(sizeX = 7, sizeY = 7, startPoint = Point(2, 2), endPoint = Point(4, 4)),
+            Field(sizeX = 8, sizeY = 8, startPoint = Point(3, 3), endPoint = Point(6, 4))
         ) // TODO: fetch
         state.currentField = state.fieldList.first()
-        state.won = false
-        state.score = 0
+    }
+
+    private fun submitSolution() {
+        val submitBody = object {
+            val name = (document.getElementById("playerName")
+                    as HTMLInputElement).value
+            val field = state.currentField
+            val solution = state.chainFieldRef.current?.getPolyline()
+        }
+        console.log(JSON.stringify(submitBody))
+        window.fetch("/submit", RequestInit(method = "POST", body = submitBody)).then {
+            state.resultsTableRef.current?.loadResults()
+        }
     }
 
     override fun RBuilder.render() {
@@ -60,14 +75,15 @@ class GamePage : RComponent<RProps, GamePageState>() {
                         }
                         styledSelect {
                             css {
-
+                                +CommonStyles.mySelect
+                                +CommonStyles.darkGreenButton
+                                +GamePageStyles.sizeValue
                             }
                             attrs {
                                 onChangeFunction = {
                                     val index = (it.target as HTMLSelectElement).value.toInt()
                                     setState {
                                         currentField = fieldList[index]
-                                        chainFieldRef.current?.clearPolyline()
                                     }
                                 }
                             }
@@ -89,6 +105,7 @@ class GamePage : RComponent<RProps, GamePageState>() {
                             }
                             attrs {
                                 placeholder = "Enter your name"
+                                id = "playerName"
                             }
                         }
                     }
@@ -100,12 +117,21 @@ class GamePage : RComponent<RProps, GamePageState>() {
                         }
                         attrs {
                             disabled = !state.won
+                            onClickFunction = {
+                                submitSolution()
+                            }
                         }
                         if (state.won) {
                             +"Submit score ${state.score}!"
                         } else {
                             +"Your score is ${state.score}."
                         }
+                    }
+                    child(ResultsTable::class) {
+                        attrs {
+                            field = state.currentField
+                        }
+                        ref = state.resultsTableRef
                     }
                 }
             }

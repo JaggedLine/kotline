@@ -6,7 +6,7 @@ fun ChainFieldProps.chainFieldStyle() {
     showGrid = true
     gridColor = rgb(48, 86, 88)
     gridWidth = 3
-    gridStep = 80
+    gridStep = 75
 
     segmentWidth = 5
     segmentColor = Color.black

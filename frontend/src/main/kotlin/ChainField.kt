@@ -37,16 +37,30 @@ external interface ChainFieldState : RState {
     var coveredNode: Point?
 }
 
-class ChainField(props: ChainFieldProps) : RComponent<ChainFieldProps, ChainFieldState>() {
+class ChainField : RComponent<ChainFieldProps, ChainFieldState>() {
     init {
-        state.polyline = mutableListOf(props.field.startPoint)
+        state.polyline = mutableListOf()
         state.coveredNode = null
     }
 
-    fun clearPolyline() {
+    fun getPolyline(): List<Point> {
+        return state.polyline
+    }
+
+    private fun clearPolyline() {
         setState {
             polyline = mutableListOf(props.field.startPoint)
             props.onPolylineChange(polyline)
+        }
+    }
+
+    override fun componentDidMount() {
+        clearPolyline()
+    }
+
+    override fun componentDidUpdate(prevProps: ChainFieldProps, prevState: ChainFieldState, snapshot: Any) {
+        if (props.field != prevProps.field) {
+            clearPolyline()
         }
     }
 

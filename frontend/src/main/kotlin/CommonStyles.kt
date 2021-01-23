@@ -50,6 +50,19 @@ object CommonStyles : StyleSheet("CommonStyles", isStatic = true) {
             backgroundColor = rgb(190, 213, 210)
         }
     }
+    val mySelect by css {
+        display = Display.inlineBlock
+        padding(0.4.em, 1.6.em, 0.4.em, 0.8.em)
+        backgroundImage = Image("url(arrow-down.svg)")
+        backgroundRepeat = BackgroundRepeat.noRepeat
+        backgroundPosition = "calc(100% - 10px) calc(50% - 1px)"
+        border = "none"
+        borderRadius = 1.25.em
+        fontFamily = "inherit"
+        lineHeight = LineHeight("1.5em")
+        cursor = Cursor.pointer
+        outline = Outline.none
+    }
     val myInput by css {
         padding(0.1.em, 0.em)
         minWidth = 0.px
