@@ -7,16 +7,30 @@ enum class Pages {
 
 external interface AppState : RState {
     var page: Pages
+    var rulesShown: Boolean
 }
 
 class App : RComponent<RProps, AppState>() {
     init {
         state.page = Pages.MAIN_PAGE
+        state.rulesShown = false
     }
 
     private fun showPage(newPage: Pages) {
         setState {
             page = newPage
+        }
+    }
+
+    private fun showRules() {
+        setState {
+            rulesShown = true
+        }
+    }
+
+    private fun closeRules() {
+        setState {
+            rulesShown = false
         }
     }
 
@@ -27,7 +41,7 @@ class App : RComponent<RProps, AppState>() {
                     showPage(Pages.MAIN_PAGE)
                 }
                 showRulesPopupFunc = {
-                    TODO()
+                    showRules()
                 }
             }
         }
@@ -38,11 +52,20 @@ class App : RComponent<RProps, AppState>() {
                         showPage(Pages.GAME_PAGE)
                     }
                     showRulesPopupFunc = {
-                        TODO()
+                        showRules()
                     }
                 }
             }
             Pages.GAME_PAGE -> child(GamePage::class) {}
+        }
+        if (state.rulesShown) {
+            child(RulesPopup::class) {
+                attrs {
+                    close = {
+                        closeRules()
+                    }
+                }
+            }
         }
     }
 }

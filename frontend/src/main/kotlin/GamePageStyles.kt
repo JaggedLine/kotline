@@ -10,7 +10,7 @@ object GamePageStyles : StyleSheet("GamePageStyles", isStatic = true) {
     }
     val fieldContainer by css {
         display = Display.flex
-        flexGrow = 10.0
+        flexGrow = 5.0
         flexShrink = 0.0
         flexBasis = FlexBasis("400px")
         minHeight = 400.px

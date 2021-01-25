@@ -13,7 +13,7 @@ class Navbar : RComponent<NavbarProps, RState>() {
             css { +NavbarStyles.navbar }
             styledButton {
                 css {
-                    +CommonStyles.flatButton
+                    +CommonStyles.linkButton
                     +NavbarStyles.navbarBrand
                 }
                 attrs {
@@ -25,8 +25,8 @@ class Navbar : RComponent<NavbarProps, RState>() {
             }
             styledButton {
                 css {
-                    +CommonStyles.flatButton
-                    +CommonStyles.hoverUnderlineButton
+                    +CommonStyles.linkButton
+                    +CommonStyles.hoverUnderline
                     +NavbarStyles.rules
                 }
                 attrs {

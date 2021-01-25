@@ -53,9 +53,14 @@ class MainPage : RComponent<MainPageProps, RState>() {
                     }
                     styledButton {
                         css {
-                            +CommonStyles.flatButton
-                            +CommonStyles.hoverUnderlineButton
+                            +CommonStyles.linkButton
+                            +CommonStyles.hoverUnderline
                             +MainPageStyles.rulesButton
+                        }
+                        attrs {
+                            onClickFunction = {
+                                props.showRulesPopupFunc()
+                            }
                         }
                         +"View rules"
                     }

@@ -22,8 +22,8 @@ class GamePage : RComponent<RProps, GamePageState>() {
         state.resultsTableRef = createRef()
         state.fieldList = listOf(
             Field(sizeX = 6, sizeY = 6, startPoint = Point(3, 3), endPoint = Point(5, 4)),
-            Field(sizeX = 7, sizeY = 7, startPoint = Point(2, 2), endPoint = Point(4, 4)),
-            Field(sizeX = 8, sizeY = 8, startPoint = Point(3, 3), endPoint = Point(6, 4))
+            Field(sizeX = 7, sizeY = 7, startPoint = Point(3, 3), endPoint = Point(6, 4)),
+            Field(sizeX = 8, sizeY = 8, startPoint = Point(1, 1), endPoint = Point(6, 6))
         ) // TODO: fetch
         state.currentField = state.fieldList.first()
     }
