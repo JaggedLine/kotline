@@ -1,0 +1,41 @@
+POST http://localhost:8080/submit
+Content-Type: application/json
+
+{
+  "name": "petya",
+  "field": {
+    "size": {
+      "rows": 6,
+      "columns": 10
+    },
+    "start": {
+      "row": 0,
+      "column": 3
+    },
+    "end": {
+      "row": 1,
+      "column": 4
+    }
+  },
+  "solution": []
+}
+
+###
+GET http://localhost:8080/getResults
+Content-Type: application/json
+Accept: application/json
+
+{
+"size": {
+"rows": 6,
+"columns": 10
+},
+"start": {
+"row": 0,
+"column": 3
+},
+"end": {
+"row": 1,
+"column": 4
+}
+}
