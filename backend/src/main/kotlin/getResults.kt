@@ -4,11 +4,11 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 
-fun Route.getResults() {
+fun Route.getResults(dsl: DSL) {
     route("/getResults") {
         get {
             val field = call.receive<Field>()
-            call.respond(database.get(field))
+            call.respond(dsl.get(field))
         }
     }
 }
