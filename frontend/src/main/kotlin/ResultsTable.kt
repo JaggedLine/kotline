@@ -1,7 +1,6 @@
 import kotlinx.browser.*
 import kotlinx.coroutines.*
 import kotlinx.css.*
-import org.w3c.dom.url.*
 import react.*
 import react.dom.*
 import styled.*
@@ -22,19 +21,17 @@ class ResultsTable : RComponent<ResultsTableProps, ResultsTableState>() {
     }
 
     private suspend fun getResults(): List<Result> {
-        console.log("get results ${props.field}")
-        val params = URLSearchParams().apply {
-            append("field", JSON.stringify(props.field))
-        }
-//        return window.fetch("/getResults?$params")
-//            .await().json().await().unsafeCast<List<Result>>()
-        return listOf(
-            Result(score = 17, playerNames = listOf("God")),
-            Result(score = 11, playerNames = listOf("Cheater", "Naughty boy")),
-            Result(score = 9, playerNames = listOf("Vasya", "Fedya", "Semen")),
-            Result(score = 7, playerNames = listOf("Besobrazie", "Kekos")),
-            Result(score = 5, playerNames = listOf("Someone"))
-        )
+        val queryString = props.field.toQueryString()
+        console.log(queryString)
+        return window.fetch("/getResults?$queryString")
+            .await().json().await().unsafeCast<List<Result>>()
+//        return listOf(
+//            Result(score = 17, playerNames = listOf("God")),
+//            Result(score = 11, playerNames = listOf("Cheater", "Naughty boy")),
+//            Result(score = 9, playerNames = listOf("Vasya", "Fedya", "Semen")),
+//            Result(score = 7, playerNames = listOf("Besobrazie", "Kekos")),
+//            Result(score = 5, playerNames = listOf("Someone"))
+//        )
     }
 
     fun loadResults() {

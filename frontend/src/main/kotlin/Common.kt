@@ -1,10 +1,42 @@
+import org.w3c.dom.url.*
+import kotlin.js.*
+
 data class Point(val x: Int, val y: Int)
 
 operator fun Point.minus(other: Point): Point {
     return Point(this.x - other.x, this.y - other.y)
 }
 
+fun Point.jsonify(): Json {
+    return json().apply {
+        this["row"] = this@jsonify.x
+        this["column"] = this@jsonify.y
+    }
+}
+
 data class Field(var sizeX: Int, var sizeY: Int, var startPoint: Point, var endPoint: Point)
+
+fun Field.jsonify(): Json {
+    return json().apply {
+        this["size"] = json().apply {
+            this["rows"] = this@jsonify.sizeX
+            this["columns"] = this@jsonify.sizeY
+        }
+        this["start"] = this@jsonify.startPoint.jsonify()
+        this["end"] = this@jsonify.endPoint.jsonify()
+    }
+}
+
+fun Field.toQueryString(): String {
+    return URLSearchParams().apply {
+        append("rows", this@toQueryString.sizeX.toString())
+        append("columns", this@toQueryString.sizeY.toString())
+        append("startRow", this@toQueryString.startPoint.x.toString())
+        append("startColumn", this@toQueryString.startPoint.y.toString())
+        append("endRow", this@toQueryString.endPoint.x.toString())
+        append("endColumn", this@toQueryString.endPoint.y.toString())
+    }.toString()
+}
 
 fun isKnightMove(from: Point, to: Point): Boolean {
     return to - from in setOf(

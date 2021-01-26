@@ -6,6 +6,7 @@ import org.w3c.fetch.*
 import react.*
 import react.dom.*
 import styled.*
+import kotlin.js.*
 
 external interface GamePageState : RState {
     var chainFieldRef: RReadableRef<ChainField>
@@ -29,14 +30,22 @@ class GamePage : RComponent<RProps, GamePageState>() {
     }
 
     private fun submitSolution() {
-        val submitBody = object {
-            val name = (document.getElementById("playerName")
+        val submitBody = json().apply {
+            this["name"] = (document.getElementById("playerName")
                     as HTMLInputElement).value
-            val field = state.currentField
-            val solution = state.chainFieldRef.current?.getPolyline()
+            this["field"] = state.currentField.jsonify()
+            this["solution"] = state.chainFieldRef.current?.getPolyline()
+                ?.map { it.jsonify() }
         }
-        console.log(JSON.stringify(submitBody))
-        window.fetch("/submit", RequestInit(method = "POST", body = submitBody)).then {
+        window.fetch(
+            "/submit", RequestInit(
+                method = "POST",
+                headers = json().apply {
+                    this["Content-Type"] = "application/json"
+                },
+                body = JSON.stringify(submitBody)
+            )
+        ).then {
             state.resultsTableRef.current?.loadResults()
         }
     }
