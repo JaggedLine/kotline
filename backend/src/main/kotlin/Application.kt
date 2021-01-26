@@ -10,7 +10,7 @@ fun Application.module() {
     install(ContentNegotiation) {
         json()
     }
-    val dsl = DSL(Database.connect("jdbc:h2:./results.db", driver = "org.h2.Driver"))
+    val dsl = DSL(Database.connect("jdbc:h2:./database/results.db", driver = "org.h2.Driver"))
     routing {
         submit(dsl)
         getResults(dsl)

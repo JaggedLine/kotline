@@ -64,7 +64,7 @@ class DSL(private val connection: Database) {
         val fieldString = Json.encodeToString(field)
         return GetResultsResponse(transaction(connection) {
             ResultsTable.select { ResultsTable.field eq fieldString }.map {
-                Result(it[ResultsTable.score], it[Json.decodeFromString(it[ResultsTable.names])])
+                Result(it[ResultsTable.score], Json.decodeFromString(it[ResultsTable.names]))
             }
         })
     }
