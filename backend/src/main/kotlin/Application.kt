@@ -1,8 +1,10 @@
 import io.ktor.application.*
 import io.ktor.features.*
+import io.ktor.http.content.*
 import io.ktor.routing.*
 import io.ktor.serialization.*
 import org.jetbrains.exposed.sql.Database
+import java.io.File
 
 fun main(args: Array<String>) = io.ktor.server.netty.EngineMain.main(args)
 
@@ -14,5 +16,10 @@ fun Application.module() {
     routing {
         submit(dsl)
         getResults(dsl)
+        static {
+            staticRootFolder = File("../frontend/build/distributions")
+            default("index.html")
+            files(".")
+        }
     }
 }
