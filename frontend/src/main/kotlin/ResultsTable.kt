@@ -5,33 +5,26 @@ import react.*
 import react.dom.*
 import styled.*
 
-data class Result(val score: Int, val playerNames: List<String>)
+class Result(val score: Int, val playerNames: Array<String>)
 
 external interface ResultsTableProps : RProps {
     var field: Field
 }
 
 external interface ResultsTableState : RState {
-    var results: List<Result>
+    var results: Array<Result>
 }
 
 class ResultsTable : RComponent<ResultsTableProps, ResultsTableState>() {
     init {
-        state.results = emptyList()
+        state.results = emptyArray()
     }
 
-    private suspend fun getResults(): List<Result> {
+    private suspend fun getResults(): Array<Result> {
         val queryString = props.field.toQueryString()
-        console.log(queryString)
         return window.fetch("/getResults?$queryString")
-            .await().json().await().unsafeCast<List<Result>>()
-//        return listOf(
-//            Result(score = 17, playerNames = listOf("God")),
-//            Result(score = 11, playerNames = listOf("Cheater", "Naughty boy")),
-//            Result(score = 9, playerNames = listOf("Vasya", "Fedya", "Semen")),
-//            Result(score = 7, playerNames = listOf("Besobrazie", "Kekos")),
-//            Result(score = 5, playerNames = listOf("Someone"))
-//        )
+            .await().json().await().asDynamic()["results"]
+            .unsafeCast<Array<Result>>()
     }
 
     fun loadResults() {
@@ -52,33 +45,65 @@ class ResultsTable : RComponent<ResultsTableProps, ResultsTableState>() {
     }
 
     override fun RBuilder.render() {
-        styledTable {
+        styledDiv {
             css {
+                +CommonStyles.scrollableWrapper
                 marginTop = 30.px
-                textAlign = TextAlign.center
             }
-            thead {
-                tr {
-                    styledTh {
-                        css { padding(10.px) }
-                        +"Players"
-                    }
-                    styledTh {
-                        css { padding(10.px) }
-                        +"Score"
+            styledDiv {
+                css {
+                    +CommonStyles.scrollable
+                    media("(max-width: 850px)") {
+                        position = Position.relative
                     }
                 }
-            }
-            tbody {
-                for (result in state.results) {
-                    tr {
-                        styledTd {
-                            css { padding(5.px) }
-                            +result.playerNames.joinToString(separator = ", ")
+                styledTable {
+                    css {
+                        width = 100.pct
+                        textAlign = TextAlign.center
+                    }
+                    thead {
+                        tr {
+                            styledTh {
+                                css {
+                                    padding(10.px)
+                                    width = 80.pct
+                                }
+                                +"Players"
+                            }
+                            styledTh {
+                                css {
+                                    padding(10.px)
+                                    width = 20.pct
+                                }
+                                +"Score"
+                            }
                         }
-                        styledTd {
-                            css { padding(5.px) }
-                            +"${result.score}"
+                    }
+                    tbody {
+                        for (result in state.results) {
+                            tr {
+                                styledTd {
+                                    css {
+                                        padding(5.px)
+                                        width = 80.pct
+                                    }
+                                    +result.playerNames.toList()
+                                        .reversed()
+                                        .take(3)
+                                        .joinToString(separator = "; ")
+                                    if (result.playerNames.size > 3) {
+                                        +"; ..."
+                                    }
+                                }
+                                styledTd {
+                                    css {
+                                        padding(5.px)
+                                        width = 20.pct
+                                    }
+                                    +"${result.score}"
+                                }
+                            }
                         }
                     }
                 }

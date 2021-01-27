@@ -35,6 +35,16 @@ object CommonStyles : StyleSheet("CommonStyles", isStatic = true) {
             maxWidth = LinearDimension.initial
         }
     }
+    val scrollableWrapper by css {
+        position = Position.relative
+        flexGrow = 1.0
+    }
+    val scrollable by css {
+        position = Position.absolute
+        height = 100.pct
+        width = 100.pct
+        overflow = Overflow.auto
+    }
     val myButton by css {
         display = Display.inlineBlock
         padding(0.5.em, 1.em)

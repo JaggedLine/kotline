@@ -114,6 +114,7 @@ class GamePage : RComponent<RProps, GamePageState>() {
                             }
                             attrs {
                                 placeholder = "Enter your name"
+                                maxLength = "20"
                                 id = "playerName"
                             }
                         }
