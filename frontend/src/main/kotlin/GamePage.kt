@@ -30,12 +30,15 @@ class GamePage : RComponent<RProps, GamePageState>() {
     }
 
     private fun submitSolution() {
+        val submitButton = document.getElementById("submitButton")
+        submitButton?.setAttribute("disabled", "")
+        submitButton?.textContent = "Submitting..."
         val submitBody = json().apply {
             this["name"] = (document.getElementById("playerName")
                     as HTMLInputElement).value
-            this["field"] = state.currentField.jsonify()
+            this["field"] = state.currentField.toJson()
             this["solution"] = state.chainFieldRef.current?.getPolyline()
-                ?.map { it.jsonify() }
+                ?.map { it.toJson() }
         }
         window.fetch(
             "/submit", RequestInit(
@@ -47,6 +50,10 @@ class GamePage : RComponent<RProps, GamePageState>() {
             )
         ).then {
             state.resultsTableRef.current?.loadResults()
+            state.chainFieldRef.current?.clearPolyline()
+        }.catch {
+            submitButton?.removeAttribute("disabled")
+            submitButton?.textContent = "Try again."
         }
     }
 
@@ -130,6 +137,7 @@ class GamePage : RComponent<RProps, GamePageState>() {
                             onClickFunction = {
                                 submitSolution()
                             }
+                            id = "submitButton"
                         }
                         if (state.won) {
                             +"Submit score ${state.score}!"

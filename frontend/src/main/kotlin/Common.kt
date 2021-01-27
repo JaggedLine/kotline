@@ -7,23 +7,23 @@ operator fun Point.minus(other: Point): Point {
     return Point(this.x - other.x, this.y - other.y)
 }
 
-fun Point.jsonify(): Json {
+fun Point.toJson(): Json {
     return json().apply {
-        this["row"] = this@jsonify.x
-        this["column"] = this@jsonify.y
+        this["row"] = this@toJson.x
+        this["column"] = this@toJson.y
     }
 }
 
 data class Field(var sizeX: Int, var sizeY: Int, var startPoint: Point, var endPoint: Point)
 
-fun Field.jsonify(): Json {
+fun Field.toJson(): Json {
     return json().apply {
         this["size"] = json().apply {
-            this["rows"] = this@jsonify.sizeX
-            this["columns"] = this@jsonify.sizeY
+            this["rows"] = this@toJson.sizeX
+            this["columns"] = this@toJson.sizeY
         }
-        this["start"] = this@jsonify.startPoint.jsonify()
-        this["end"] = this@jsonify.endPoint.jsonify()
+        this["start"] = this@toJson.startPoint.toJson()
+        this["end"] = this@toJson.endPoint.toJson()
     }
 }
 
