@@ -45,65 +45,50 @@ class ResultsTable : RComponent<ResultsTableProps, ResultsTableState>() {
     }
 
     override fun RBuilder.render() {
-        styledDiv {
+        styledTable {
             css {
-                +CommonStyles.scrollableWrapper
-                marginTop = 30.px
+                padding(0.px, 30.px, 30.px, 30.px)
+                width = 100.pct
+                textAlign = TextAlign.center
             }
-            styledDiv {
-                css {
-                    +CommonStyles.scrollable
-                    media("(max-width: 850px)") {
-                        position = Position.relative
+            thead {
+                tr {
+                    styledTh {
+                        css {
+                            padding(10.px)
+                            width = 80.pct
+                        }
+                        +"Players"
+                    }
+                    styledTh {
+                        css {
+                            padding(10.px)
+                            width = 20.pct
+                        }
+                        +"Score"
                     }
                 }
-                styledTable {
-                    css {
-                        width = 100.pct
-                        textAlign = TextAlign.center
-                    }
-                    thead {
-                        tr {
-                            styledTh {
-                                css {
-                                    padding(10.px)
-                                    width = 80.pct
-                                }
-                                +"Players"
+            }
+            tbody {
+                for (result in state.results) {
+                    tr {
+                        styledTd {
+                            css {
+                                padding(5.px)
+                                width = 80.pct
                             }
-                            styledTh {
-                                css {
-                                    padding(10.px)
-                                    width = 20.pct
-                                }
-                                +"Score"
+                            +result.playerNames.toList().reversed().take(3)
+                                .joinToString(separator = "; ")
+                            if (result.playerNames.size > 3) {
+                                +"; ..."
                             }
                         }
-                    }
-                    tbody {
-                        for (result in state.results) {
-                            tr {
-                                styledTd {
-                                    css {
-                                        padding(5.px)
-                                        width = 80.pct
-                                    }
-                                    +result.playerNames.toList()
-                                        .reversed()
-                                        .take(3)
-                                        .joinToString(separator = "; ")
-                                    if (result.playerNames.size > 3) {
-                                        +"; ..."
-                                    }
-                                }
-                                styledTd {
-                                    css {
-                                        padding(5.px)
-                                        width = 20.pct
-                                    }
-                                    +"${result.score}"
-                                }
+                        styledTd {
+                            css {
+                                padding(5.px)
+                                width = 20.pct
                             }
+                            +"${result.score}"
                         }
                     }
                 }

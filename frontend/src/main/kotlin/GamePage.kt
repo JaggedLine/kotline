@@ -1,4 +1,5 @@
 import kotlinx.browser.*
+import kotlinx.css.*
 import kotlinx.html.*
 import kotlinx.html.js.*
 import org.w3c.dom.*
@@ -84,72 +85,86 @@ class GamePage : RComponent<RProps, GamePageState>() {
                 styledDiv {
                     css { +GamePageStyles.rightContainer }
                     styledDiv {
-                        css { +GamePageStyles.sizeRow }
-                        styledH3 {
-                            css { +GamePageStyles.sizeTitle }
-                            +"Field size:"
+                        css { +GamePageStyles.submitSection }
+                        styledDiv {
+                            css { +GamePageStyles.sizeRow }
+                            styledH3 {
+                                css { +GamePageStyles.sizeTitle }
+                                +"Field size:"
+                            }
+                            styledSelect {
+                                css {
+                                    +CommonStyles.mySelect
+                                    +CommonStyles.darkGreenButton
+                                    +GamePageStyles.sizeValue
+                                }
+                                attrs {
+                                    onChangeFunction = {
+                                        val index = (it.target as HTMLSelectElement).value.toInt()
+                                        setState {
+                                            currentField = fieldList[index]
+                                        }
+                                    }
+                                }
+                                state.fieldList.forEachIndexed { index, field ->
+                                    option {
+                                        attrs {
+                                            value = "$index"
+                                        }
+                                        +"${field.sizeX} x ${field.sizeY}"
+                                    }
+                                }
+                            }
                         }
-                        styledSelect {
+                        label {
+                            styledInput {
+                                css {
+                                    +CommonStyles.myInput
+                                    +GamePageStyles.nameInput
+                                }
+                                attrs {
+                                    placeholder = "Enter your name"
+                                    maxLength = "20"
+                                    id = "playerName"
+                                }
+                            }
+                        }
+                        styledButton {
                             css {
-                                +CommonStyles.mySelect
+                                +CommonStyles.myButton
                                 +CommonStyles.darkGreenButton
-                                +GamePageStyles.sizeValue
+                                +GamePageStyles.submitButton
                             }
                             attrs {
-                                onChangeFunction = {
-                                    val index = (it.target as HTMLSelectElement).value.toInt()
-                                    setState {
-                                        currentField = fieldList[index]
-                                    }
+                                disabled = !state.won
+                                onClickFunction = {
+                                    submitSolution()
                                 }
+                                id = "submitButton"
                             }
-                            state.fieldList.forEachIndexed { index, field ->
-                                option {
-                                    attrs {
-                                        value = "$index"
-                                    }
-                                    +"${field.sizeX} x ${field.sizeY}"
-                                }
+                            if (state.won) {
+                                +"Submit score ${state.score}!"
+                            } else {
+                                +"Your score is ${state.score}."
                             }
                         }
                     }
-                    label {
-                        styledInput {
+                    styledDiv {
+                        css { +CommonStyles.scrollableWrapper }
+                        styledDiv {
                             css {
-                                +CommonStyles.myInput
-                                +GamePageStyles.nameInput
+                                +CommonStyles.scrollable
+                                media("(max-width: 850px)") {
+                                    position = Position.relative
+                                }
                             }
-                            attrs {
-                                placeholder = "Enter your name"
-                                maxLength = "20"
-                                id = "playerName"
+                            child(ResultsTable::class) {
+                                attrs {
+                                    field = state.currentField
+                                }
+                                ref = state.resultsTableRef
                             }
                         }
-                    }
-                    styledButton {
-                        css {
-                            +CommonStyles.myButton
-                            +CommonStyles.darkGreenButton
-                            +GamePageStyles.submitButton
-                        }
-                        attrs {
-                            disabled = !state.won
-                            onClickFunction = {
-                                submitSolution()
-                            }
-                            id = "submitButton"
-                        }
-                        if (state.won) {
-                            +"Submit score ${state.score}!"
-                        } else {
-                            +"Your score is ${state.score}."
-                        }
-                    }
-                    child(ResultsTable::class) {
-                        attrs {
-                            field = state.currentField
-                        }
-                        ref = state.resultsTableRef
                     }
                 }
             }

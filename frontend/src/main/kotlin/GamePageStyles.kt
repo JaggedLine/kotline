@@ -23,8 +23,12 @@ object GamePageStyles : StyleSheet("GamePageStyles", isStatic = true) {
         flexGrow = 1.0
         flexShrink = 0.0
         flexBasis = FlexBasis("400px")
-        padding(30.px)
         backgroundColor = rgb(217, 232, 230)
+    }
+    val submitSection by css {
+        display = Display.flex
+        flexDirection = FlexDirection.column
+        padding(30.px)
     }
     val sizeRow by css {
         display = Display.flex
