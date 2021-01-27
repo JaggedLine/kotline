@@ -21,6 +21,29 @@ class DSL(private val connection: Database) {
         }
     }
 
+    private fun removeOccurrences(name: String, standings: List<ResultsTableRow>, newSize: Int): Boolean {
+        for (row in standings) {
+            if (name in row.names) {
+                if (row.solution.size >= newSize) {
+                    return false
+                }
+                val newNames = row.names.minus(name)
+                if (newNames.isEmpty()) {
+                    transaction(connection) {
+                        ResultsTable.deleteWhere { ResultsTable.id eq row.id }
+                    }
+                } else {
+                    transaction(connection) {
+                        ResultsTable.update({ResultsTable.id eq row.id}) {
+                            it[names] = Json.encodeToString(newNames)
+                        }
+                    }
+                }
+            }
+        }
+        return true
+    }
+
     fun insert(claim: Claim): Pair<Boolean, String> {
         val verificationResult = verify(claim)
         if (!verificationResult.first) {
@@ -33,6 +56,12 @@ class DSL(private val connection: Database) {
                 ResultsTableRow(it[ResultsTable.id],
                     Json.decodeFromString(it[ResultsTable.solution]),
                     Json.decodeFromString(it[ResultsTable.names]))
+            }
+        }
+
+        if (claim.name.isNotEmpty()) {
+            if (!removeOccurrences(claim.name, standings, claim.solution.size)) {
+                return Pair(false, "You have already got a better result")
             }
         }
 
@@ -50,7 +79,7 @@ class DSL(private val connection: Database) {
             }
             if (claim.solution == standings[i].solution) {
                 transaction(connection) {
-                    ResultsTable.update({ResultsTable.id eq standings[i].id}) {
+                    ResultsTable.update({ ResultsTable.id eq standings[i].id }) {
                         it[names] = Json.encodeToString(standings[i].names + listOf(claim.name))
                     }
                 }
@@ -63,8 +92,18 @@ class DSL(private val connection: Database) {
     fun get(field: Field): GetResultsResponse {
         val fieldString = Json.encodeToString(field)
         return GetResultsResponse(transaction(connection) {
-            ResultsTable.select { ResultsTable.field eq fieldString }.map {
-                Result(it[ResultsTable.score], Json.decodeFromString(it[ResultsTable.names]))
+            ResultsTable.select { ResultsTable.field eq fieldString }
+                .orderBy(ResultsTable.score to SortOrder.DESC)
+                .map {
+                Result(
+                    it[ResultsTable.score],
+                    Json.decodeFromString<List<String>>(it[ResultsTable.names]).map {
+                        when (it) {
+                            "" -> "Anonymous"
+                            else -> it
+                        }
+                    }
+                )
             }
         })
     }
