@@ -136,5 +136,7 @@ class DSL(private val connection: Database) {
         })
     }
 
-    fun getFields(): List<Field> = TODO()
+    fun getFields(): List<Field> = transaction(connection) {
+        FieldsTable.selectAll().map { Json.decodeFromString(it[FieldsTable.description]) }
+    }
 }

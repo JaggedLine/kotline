@@ -18,6 +18,7 @@ fun Application.module() {
     routing {
         submit(dsl)
         getResults(dsl)
+        getFields(dsl)
         static {
             staticRootFolder = File("../frontend/build/distributions")
             default("index.html")
