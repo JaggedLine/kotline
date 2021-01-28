@@ -52,4 +52,5 @@ object GamePageStyles : StyleSheet("GamePageStyles", isStatic = true) {
         marginTop = 20.px
         fontSize = 1.em
     }
+    val enterGodModeButton = submitButton
 }

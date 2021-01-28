@@ -66,6 +66,9 @@ fun segmentsIntersect(a: Point, b: Point, c: Point, d: Point): Boolean {
 }
 
 fun isPolylineValid(polyline: List<Point>, field: Field): Boolean {
+    if (polyline.isEmpty() || polyline.first() != field.startPoint) {
+        return false
+    }
     for (point in polyline) {
         if (point.x < 0 || point.x > field.sizeX || point.y < 0 || point.y > field.sizeY) {
             return false

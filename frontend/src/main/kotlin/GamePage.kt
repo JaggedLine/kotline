@@ -16,6 +16,10 @@ external interface GamePageState : RState {
     var currentField: Field
     var won: Boolean
     var score: Int
+    var submitting: Boolean
+    var submitFailed: Boolean
+    var isNameGod: Boolean
+    var godMode: Boolean
 }
 
 class GamePage : RComponent<RProps, GamePageState>() {
@@ -28,12 +32,17 @@ class GamePage : RComponent<RProps, GamePageState>() {
             Field(sizeX = 8, sizeY = 8, startPoint = Point(1, 1), endPoint = Point(6, 6))
         ) // TODO: fetch
         state.currentField = state.fieldList.first()
+        state.submitting = false
+        state.submitFailed = false
+        state.isNameGod = false
+        state.godMode = false
     }
 
     private fun submitSolution() {
-        val submitButton = document.getElementById("submitButton")
-        submitButton?.setAttribute("disabled", "")
-        submitButton?.textContent = "Submitting..."
+        setState {
+            submitting = true
+            submitFailed = false
+        }
         val submitBody = json().apply {
             this["name"] = (document.getElementById("playerName")
                     as HTMLInputElement).value
@@ -52,9 +61,15 @@ class GamePage : RComponent<RProps, GamePageState>() {
         ).then {
             state.resultsTableRef.current?.loadResults()
             state.chainFieldRef.current?.clearPolyline()
+            setState {
+                submitting = false
+                submitFailed = false
+            }
         }.catch {
-            submitButton?.removeAttribute("disabled")
-            submitButton?.textContent = "Try again."
+            setState {
+                submitting = false
+                submitFailed = true
+            }
         }
     }
 
@@ -100,7 +115,8 @@ class GamePage : RComponent<RProps, GamePageState>() {
                                 }
                                 attrs {
                                     onChangeFunction = {
-                                        val index = (it.target as HTMLSelectElement).value.toInt()
+                                        val index = (it.target as HTMLSelectElement)
+                                            .value.toInt()
                                         setState {
                                             currentField = fieldList[index]
                                         }
@@ -116,53 +132,86 @@ class GamePage : RComponent<RProps, GamePageState>() {
                                 }
                             }
                         }
-                        label {
-                            styledInput {
-                                css {
-                                    +CommonStyles.myInput
-                                    +GamePageStyles.nameInput
-                                }
-                                attrs {
-                                    placeholder = "Enter your name"
-                                    maxLength = "20"
-                                    id = "playerName"
+                        if (!state.godMode) {
+                            label {
+                                styledInput {
+                                    css {
+                                        +CommonStyles.myInput
+                                        +GamePageStyles.nameInput
+                                    }
+                                    attrs {
+                                        placeholder = "Enter your name"
+                                        maxLength = "20"
+                                        id = "playerName"
+                                        onChangeFunction = {
+                                            if ((it.target as HTMLInputElement).value == "GOD") {
+                                                setState {
+                                                    isNameGod = true
+                                                }
+                                            } else {
+                                                setState {
+                                                    isNameGod = false
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
-                        }
-                        styledButton {
-                            css {
-                                +CommonStyles.myButton
-                                +CommonStyles.darkGreenButton
-                                +GamePageStyles.submitButton
-                            }
-                            attrs {
-                                disabled = !state.won
-                                onClickFunction = {
-                                    submitSolution()
+                            if (!state.isNameGod) {
+                                styledButton {
+                                    css {
+                                        +CommonStyles.myButton
+                                        +CommonStyles.darkGreenButton
+                                        +GamePageStyles.submitButton
+                                    }
+                                    attrs {
+                                        disabled = !state.won || state.submitting
+                                        onClickFunction = {
+                                            submitSolution()
+                                        }
+                                    }
+                                    when {
+                                        state.submitting -> +"Submitting..."
+                                        state.submitFailed -> +"Try again"
+                                        state.won -> +"Submit score ${state.score}!"
+                                        else -> +"Your score is ${state.score}."
+                                    }
                                 }
-                                id = "submitButton"
-                            }
-                            if (state.won) {
-                                +"Submit score ${state.score}!"
                             } else {
-                                +"Your score is ${state.score}."
+                                styledButton {
+                                    css {
+                                        +CommonStyles.myButton
+                                        +CommonStyles.darkGreenButton
+                                        +GamePageStyles.enterGodModeButton
+                                    }
+                                    attrs {
+                                        onClickFunction = {
+                                            setState {
+                                                godMode = true
+                                            }
+                                        }
+                                    }
+                                    +"Enter GOD mode"
+                                }
                             }
                         }
                     }
-                    styledDiv {
-                        css { +CommonStyles.scrollableWrapper }
+                    if (!state.godMode) {
                         styledDiv {
-                            css {
-                                +CommonStyles.scrollable
-                                media("(max-width: 850px)") {
-                                    position = Position.relative
+                            css { +CommonStyles.scrollableWrapper }
+                            styledDiv {
+                                css {
+                                    +CommonStyles.scrollable
+                                    media("(max-width: 850px)") {
+                                        position = Position.relative
+                                    }
                                 }
-                            }
-                            child(ResultsTable::class) {
-                                attrs {
-                                    field = state.currentField
+                                child(ResultsTable::class) {
+                                    attrs {
+                                        field = state.currentField
+                                    }
+                                    ref = state.resultsTableRef
                                 }
-                                ref = state.resultsTableRef
                             }
                         }
                     }
