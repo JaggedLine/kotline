@@ -6,7 +6,7 @@ import java.io.File
 
 data class ResultsTableRow(val id: Int, val solution: List<Coords>, val names: List<String>)
 
-class DSL(private val connResults: Database, private val connFields: Database) {
+class DSL(private val connection: Database) {
     object ResultsTable : Table() {
         val id: Column<Int> = integer("id").autoIncrement()
         val fieldId: Column<Int> = integer("fieldId")
@@ -16,17 +16,17 @@ class DSL(private val connResults: Database, private val connFields: Database) {
         override val primaryKey = PrimaryKey(id)
     }
 
-    object FieldsTable: Table() {
+    object FieldsTable : Table() {
         val description: Column<String> = text("description", eagerLoading = true)
         val id: Column<Int> = integer("id").autoIncrement()
         override val primaryKey = PrimaryKey(id)
     }
 
     init {
-        transaction(connResults) {
+        transaction(connection) {
             SchemaUtils.create(ResultsTable)
         }
-        transaction(connFields) {
+        transaction(connection) {
             if (!FieldsTable.exists()) {
                 SchemaUtils.create(FieldsTable)
                 val fields: List<Field> = Json.decodeFromString(File("src/main/resources/fields.json").readText())
@@ -45,12 +45,12 @@ class DSL(private val connResults: Database, private val connFields: Database) {
                 }
                 val newNames = row.names.minus(name)
                 if (newNames.isEmpty()) {
-                    transaction(connResults) {
+                    transaction(connection) {
                         ResultsTable.deleteWhere { ResultsTable.id eq row.id }
                     }
                 } else {
-                    transaction(connResults) {
-                        ResultsTable.update({ResultsTable.id eq row.id}) {
+                    transaction(connection) {
+                        ResultsTable.update({ ResultsTable.id eq row.id }) {
                             it[names] = Json.encodeToString(newNames)
                         }
                     }
@@ -61,7 +61,7 @@ class DSL(private val connResults: Database, private val connFields: Database) {
     }
 
     private fun getFieldId(fieldString: String): Int? {
-        return transaction(connFields) {
+        return transaction(connection) {
             FieldsTable.select { FieldsTable.description eq fieldString }.map {
                 it[FieldsTable.id]
             }.firstOrNull()
@@ -76,12 +76,15 @@ class DSL(private val connResults: Database, private val connFields: Database) {
         if (!verificationResult.first) {
             return verificationResult
         }
-        val standings = transaction(connResults) {
-            ResultsTable.select { ResultsTable.fieldId eq curFieldId }.orderBy(ResultsTable.score to SortOrder.DESC).map {
-                ResultsTableRow(it[ResultsTable.id],
-                    Json.decodeFromString(it[ResultsTable.solution]),
-                    Json.decodeFromString(it[ResultsTable.names]))
-            }
+        val standings = transaction(connection) {
+            ResultsTable.select { ResultsTable.fieldId eq curFieldId }.orderBy(ResultsTable.score to SortOrder.DESC)
+                .map {
+                    ResultsTableRow(
+                        it[ResultsTable.id],
+                        Json.decodeFromString(it[ResultsTable.solution]),
+                        Json.decodeFromString(it[ResultsTable.names])
+                    )
+                }
         }
 
         if (claim.name.isNotEmpty()) {
@@ -92,7 +95,7 @@ class DSL(private val connResults: Database, private val connFields: Database) {
 
         for (i in 0..standings.size) {
             if (i == standings.size || claim.solution.size > standings[i].solution.size) {
-                transaction(connResults) {
+                transaction(connection) {
                     ResultsTable.insert {
                         it[fieldId] = curFieldId
                         it[score] = claim.solution.size - 1
@@ -103,7 +106,7 @@ class DSL(private val connResults: Database, private val connFields: Database) {
                 break
             }
             if (claim.solution == standings[i].solution) {
-                transaction(connResults) {
+                transaction(connection) {
                     ResultsTable.update({ ResultsTable.id eq standings[i].id }) {
                         it[names] = Json.encodeToString(standings[i].names + listOf(claim.name))
                     }
@@ -116,20 +119,22 @@ class DSL(private val connResults: Database, private val connFields: Database) {
 
     fun get(field: Field): GetResultsResponse {
         val fieldId = getFieldId(Json.encodeToString(field)) ?: return GetResultsResponse(emptyList())
-        return GetResultsResponse(transaction(connResults) {
+        return GetResultsResponse(transaction(connection) {
             ResultsTable.select { ResultsTable.fieldId eq fieldId }
                 .orderBy(ResultsTable.score to SortOrder.DESC)
                 .map {
-                Result(
-                    it[ResultsTable.score],
-                    Json.decodeFromString<List<String>>(it[ResultsTable.names]).map {
-                        when (it) {
-                            "" -> "Anonymous"
-                            else -> it
+                    Result(
+                        it[ResultsTable.score],
+                        Json.decodeFromString<List<String>>(it[ResultsTable.names]).map {
+                            when (it) {
+                                "" -> "Anonymous"
+                                else -> it
+                            }
                         }
-                    }
-                )
-            }
+                    )
+                }
         })
     }
+
+    fun getFields(): List<Field> = TODO()
 }

@@ -14,7 +14,6 @@ fun Application.module() {
     }
     val dsl = DSL(
         Database.connect("jdbc:h2:./database/results.db", driver = "org.h2.Driver"),
-        Database.connect("jdbc:h2:./database/fields.db", driver = "org.h2.Driver")
     )
     routing {
         submit(dsl)
