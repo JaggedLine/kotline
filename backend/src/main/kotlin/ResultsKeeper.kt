@@ -2,22 +2,38 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.io.File
 
 data class ResultsTableRow(val id: Int, val solution: List<Coords>, val names: List<String>)
 
-class DSL(private val connection: Database) {
+class DSL(private val connResults: Database, private val connFields: Database) {
     object ResultsTable : Table() {
         val id: Column<Int> = integer("id").autoIncrement()
-        val field: Column<String> = text("field", eagerLoading = true)
+        val fieldId: Column<Int> = integer("fieldId")
         val score: Column<Int> = integer("score")
         val solution: Column<String> = text("solution", eagerLoading = true)
         val names: Column<String> = text("names", eagerLoading = true)
         override val primaryKey = PrimaryKey(id)
     }
 
+    object FieldsTable: Table() {
+        val description: Column<String> = text("description", eagerLoading = true)
+        val id: Column<Int> = integer("id").autoIncrement()
+        override val primaryKey = PrimaryKey(id)
+    }
+
     init {
-        transaction(connection) {
+        transaction(connResults) {
             SchemaUtils.create(ResultsTable)
+        }
+        transaction(connFields) {
+            if (!FieldsTable.exists()) {
+                SchemaUtils.create(FieldsTable)
+                val fields: List<Field> = Json.decodeFromString(File("src/main/resources/fields.json").readText())
+                FieldsTable.batchInsert(fields) {
+                    this[FieldsTable.description] = Json.encodeToString(it)
+                }
+            }
         }
     }
 
@@ -29,11 +45,11 @@ class DSL(private val connection: Database) {
                 }
                 val newNames = row.names.minus(name)
                 if (newNames.isEmpty()) {
-                    transaction(connection) {
+                    transaction(connResults) {
                         ResultsTable.deleteWhere { ResultsTable.id eq row.id }
                     }
                 } else {
-                    transaction(connection) {
+                    transaction(connResults) {
                         ResultsTable.update({ResultsTable.id eq row.id}) {
                             it[names] = Json.encodeToString(newNames)
                         }
@@ -44,15 +60,24 @@ class DSL(private val connection: Database) {
         return true
     }
 
+    private fun getFieldId(fieldString: String): Int? {
+        return transaction(connFields) {
+            FieldsTable.select { FieldsTable.description eq fieldString }.map {
+                it[FieldsTable.id]
+            }.firstOrNull()
+        }
+    }
+
     fun insert(claim: Claim): Pair<Boolean, String> {
+        val fieldString = Json.encodeToString(claim.field)
+        val curFieldId = getFieldId(fieldString) ?: return Pair(false, "Invalid field")
+
         val verificationResult = verify(claim)
         if (!verificationResult.first) {
             return verificationResult
         }
-
-        val fieldString = Json.encodeToString(claim.field)
-        val standings = transaction(connection) {
-            ResultsTable.select { ResultsTable.field eq fieldString }.orderBy(ResultsTable.score to SortOrder.DESC).map {
+        val standings = transaction(connResults) {
+            ResultsTable.select { ResultsTable.fieldId eq curFieldId }.orderBy(ResultsTable.score to SortOrder.DESC).map {
                 ResultsTableRow(it[ResultsTable.id],
                     Json.decodeFromString(it[ResultsTable.solution]),
                     Json.decodeFromString(it[ResultsTable.names]))
@@ -67,9 +92,9 @@ class DSL(private val connection: Database) {
 
         for (i in 0..standings.size) {
             if (i == standings.size || claim.solution.size > standings[i].solution.size) {
-                transaction(connection) {
+                transaction(connResults) {
                     ResultsTable.insert {
-                        it[field] = fieldString
+                        it[fieldId] = curFieldId
                         it[score] = claim.solution.size - 1
                         it[solution] = Json.encodeToString(claim.solution)
                         it[names] = Json.encodeToString(mutableListOf(claim.name))
@@ -78,7 +103,7 @@ class DSL(private val connection: Database) {
                 break
             }
             if (claim.solution == standings[i].solution) {
-                transaction(connection) {
+                transaction(connResults) {
                     ResultsTable.update({ ResultsTable.id eq standings[i].id }) {
                         it[names] = Json.encodeToString(standings[i].names + listOf(claim.name))
                     }
@@ -90,9 +115,9 @@ class DSL(private val connection: Database) {
     }
 
     fun get(field: Field): GetResultsResponse {
-        val fieldString = Json.encodeToString(field)
-        return GetResultsResponse(transaction(connection) {
-            ResultsTable.select { ResultsTable.field eq fieldString }
+        val fieldId = getFieldId(Json.encodeToString(field)) ?: return GetResultsResponse(emptyList())
+        return GetResultsResponse(transaction(connResults) {
+            ResultsTable.select { ResultsTable.fieldId eq fieldId }
                 .orderBy(ResultsTable.score to SortOrder.DESC)
                 .map {
                 Result(
