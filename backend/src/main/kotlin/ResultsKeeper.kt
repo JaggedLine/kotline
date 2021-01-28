@@ -27,14 +27,14 @@ class DSL(private val connection: Database) {
             SchemaUtils.create(ResultsTable)
         }
         transaction(connection) {
-            if (!FieldsTable.exists()) {
-                SchemaUtils.create(FieldsTable)
+            SchemaUtils.create(FieldsTable)
+            if (FieldsTable.selectAll().empty()) {
                 val fields: List<Field> = Json.decodeFromString(File("src/main/resources/fields.json").readText())
                 FieldsTable.batchInsert(fields) {
                     this[FieldsTable.description] = Json.encodeToString(it)
                 }
             }
-        }
+    }
     }
 
     private fun removeOccurrences(name: String, standings: List<ResultsTableRow>, newSize: Int): Boolean {
