@@ -14,6 +14,12 @@ The goal is to create as long polyline as possible.
 
 ----
 
+You need to compile the "frontend" module by running:
+
+`./gradlew browserDistribution`
+
+You have to do it before the first run.
+
 To run the server, execute this command:
 
 `./gradlew run`
