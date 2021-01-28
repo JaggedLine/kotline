@@ -7,7 +7,13 @@ import io.ktor.routing.*
 fun Route.submit(dsl: DSL) {
     route("/submit") {
         post {
-            val claim = call.receive<Claim>()
+            val claim: Claim
+            try {
+                claim = call.receive<Claim>()
+            } catch (e: Throwable) {
+                call.respondText("Incorrect data", status = HttpStatusCode.NotAcceptable)
+                return@post
+            }
             val isGood = dsl.insert(claim)
             if (isGood.first) {
                 call.respondText("The result has been received", status = HttpStatusCode.Accepted)
