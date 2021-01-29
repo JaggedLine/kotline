@@ -1,5 +1,4 @@
 # Kotlin line
-____
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -11,8 +10,6 @@ The goal is to create as long polyline as possible.
 <img width="200" alt="Screenshot 2021-01-28 at 22 43 28" src="https://user-images.githubusercontent.com/42250320/106190231-69192900-61ba-11eb-9b19-5f4458b22a4f.png">
 
 # Installation
-
-----
 
 You need to compile the "frontend" module by running:
 
