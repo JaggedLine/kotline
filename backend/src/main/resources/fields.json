@@ -5,12 +5,12 @@
       "columns": 5
     },
     "start": {
-      "row": 1,
-      "column": 2
+      "row": 0,
+      "column": 0
     },
     "end": {
-      "row": 4,
-      "column": 3
+      "row": 1,
+      "column": 0
     }
   },
   {
