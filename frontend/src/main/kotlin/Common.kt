@@ -38,15 +38,16 @@ fun Field.toQueryString(): String {
     }.toString()
 }
 
-fun isKnightMove(from: Point, to: Point): Boolean {
-    return to - from in setOf(
-        Point(1, 2), Point(1, -2), Point(-1, 2), Point(-1, -2),
-        Point(2, 1), Point(2, -1), Point(-2, 1), Point(-2, -1)
-    )
-}
-
 fun crossProduct(a: Point, b: Point): Int {
     return a.x * b.y - a.y * b.x
+}
+
+fun dotProduct(a: Point, b: Point): Int {
+    return a.x * b.x + a.y * b.y
+}
+
+fun isKnightMove(from: Point, to: Point): Boolean {
+    return dotProduct(from - to, from - to) == 5
 }
 
 fun segmentsIntersect(a: Point, b: Point, c: Point, d: Point): Boolean {
@@ -65,25 +66,13 @@ fun segmentsIntersect(a: Point, b: Point, c: Point, d: Point): Boolean {
     return false
 }
 
-fun isPolylineValid(polyline: List<Point>, field: Field): Boolean {
-    if (polyline.isEmpty() || polyline.first() != field.startPoint) {
+fun canAdd(polyline: List<Point>, nextPoint: Point): Boolean {
+    if (!isKnightMove(polyline.last(), nextPoint)) {
         return false
     }
-    for (point in polyline) {
-        if (point.x < 0 || point.x > field.sizeX || point.y < 0 || point.y > field.sizeY) {
-            return false
-        }
-    }
     for (i in 0 until polyline.size - 1) {
-        if (!isKnightMove(polyline[i], polyline[i + 1])) {
+        if (segmentsIntersect(polyline[i], polyline[i + 1], polyline.last(), nextPoint)) {
             return false
-        }
-    }
-    for (i in 0 until polyline.size - 1) {
-        for (j in 0 until polyline.size - 1) {
-            if (segmentsIntersect(polyline[i], polyline[i + 1], polyline[j], polyline[j + 1])) {
-                return false
-            }
         }
     }
     return true
