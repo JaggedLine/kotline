@@ -188,7 +188,7 @@ class ChainField : RComponent<ChainFieldProps, ChainFieldState>() {
                                         while (polyline.last() != curPoint) {
                                             polyline.removeLast()
                                         }
-                                    } else if (isPolylineValid(polyline + curPoint, props.field)) {
+                                    } else if (canAdd(polyline, curPoint)) {
                                         polyline.add(curPoint)
                                     }
                                     props.onPolylineChange(polyline)
