@@ -40,6 +40,19 @@ class Tests {
     }
 
     @Test
+    fun incorrectJSON() {
+        withTestApplication({ module() }) {
+            handleRequest(HttpMethod.Post, "/submit") {
+                addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                setBody("""{"hi": "server"}""")
+            }.apply {
+                assertEquals(HttpStatusCode.NotAcceptable, response.status())
+                println(response.content)
+            }
+        }
+    }
+
+    @Test
     fun testSubmit0() {
         testSequence(emptyList(), HttpStatusCode.NotAcceptable)
     }
