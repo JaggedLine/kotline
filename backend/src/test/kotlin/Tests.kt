@@ -6,13 +6,13 @@ import kotlinx.serialization.json.*
 import kotlinx.serialization.*
 
 class Tests {
-    val field = Field(
+    private val field = Field(
         size = FieldSize(5, 5),
-        start = Coords(0, 0),
-        end = Coords(1, 0)
+        start = Coords(1, 2),
+        end = Coords(4, 3)
     )
 
-    fun testGet(uri: String, status: HttpStatusCode) {
+    private fun testGet(uri: String, status: HttpStatusCode) {
         withTestApplication({ module() }) {
             handleRequest(HttpMethod.Get, uri).apply {
                 assertEquals(status, response.status())
@@ -26,7 +26,7 @@ class Tests {
         testGet("/getFields", HttpStatusCode.OK)
     }
 
-    fun testSequence(solution: List<Coords>, status: HttpStatusCode, name: String = "cookiedoth") {
+    private fun testSequence(solution: List<Coords>, status: HttpStatusCode, name: String = "cookiedoth") {
         withTestApplication({ module() }) {
             handleRequest(HttpMethod.Post, "/submit") {
                 val a = Claim(name, field, solution)
@@ -60,8 +60,8 @@ class Tests {
     @Test
     fun testSubmit1() {
         testSequence(listOf(
-            Coords(0, 2),
-            Coords(1, 0)
+            Coords(2, 4),
+            Coords(4, 3)
         ), HttpStatusCode.NotAcceptable
         )
     }
@@ -69,8 +69,8 @@ class Tests {
     @Test
     fun testSubmit2() {
         testSequence(listOf(
-            Coords(0, 0),
-            Coords(1, 2)
+            Coords(1, 2),
+            Coords(2, 4)
         ), HttpStatusCode.NotAcceptable
         )
     }
@@ -78,12 +78,11 @@ class Tests {
     @Test
     fun testSubmit3() {
         testSequence(listOf(
-            Coords(0, 0),
-            Coords(1, 2),
-            Coords(3, 3),
             Coords(1, 2),
             Coords(3, 1),
-            Coords(1, 0)
+            Coords(1, 2),
+            Coords(2, 4),
+            Coords(4, 3)
         ), HttpStatusCode.NotAcceptable
         )
     }
@@ -91,8 +90,8 @@ class Tests {
     @Test
     fun testSubmit4() {
         testSequence(listOf(
-            Coords(0, 0),
-            Coords(1, 0)
+            Coords(1, 2),
+            Coords(4, 3)
         ), HttpStatusCode.NotAcceptable
         )
     }
@@ -100,9 +99,11 @@ class Tests {
     @Test
     fun testSubmit5() {
         testSequence(listOf(
-            Coords(0, 0),
-            Coords(-1, 0),
-            Coords(1, 0)
+            Coords(1, 2),
+            Coords(-1, 3),
+            Coords(1, 4),
+            Coords(2, 2),
+            Coords(4, 3)
         ), HttpStatusCode.NotAcceptable
         )
     }
@@ -110,10 +111,11 @@ class Tests {
     @Test
     fun testSubmit6() {
         testSequence(listOf(
-            Coords(0, 0),
-            Coords(2, 1),
-            Coords(0, 2),
-            Coords(1, 0)
+            Coords(1, 2),
+            Coords(3, 3),
+            Coords(1, 4),
+            Coords(2, 2),
+            Coords(4, 3)
         ), HttpStatusCode.NotAcceptable
         )
     }
@@ -121,10 +123,11 @@ class Tests {
     @Test
     fun testSubmit7() {
         testSequence(listOf(
-            Coords(0, 0),
             Coords(1, 2),
+            Coords(0, 4),
+            Coords(2, 3),
             Coords(3, 1),
-            Coords(1, 0)
+            Coords(4, 3)
         ), HttpStatusCode.Accepted
         )
     }
@@ -132,12 +135,17 @@ class Tests {
     @Test
     fun testSubmit8() {
         testSequence(listOf(
-            Coords(0, 0),
+            Coords(1, 2),
+            Coords(0, 4),
+            Coords(2, 3),
+            Coords(4, 4),
+            Coords(3, 2),
+            Coords(1, 3),
             Coords(2, 1),
             Coords(0, 2),
-            Coords(2, 3),
+            Coords(1, 0),
             Coords(3, 1),
-            Coords(1, 0)
+            Coords(4, 3)
         ), HttpStatusCode.Accepted
         )
     }
@@ -145,10 +153,11 @@ class Tests {
     @Test
     fun testSubmit9() {
         testSequence(listOf(
-            Coords(0, 0),
             Coords(1, 2),
+            Coords(0, 4),
+            Coords(2, 3),
             Coords(3, 1),
-            Coords(1, 0)
+            Coords(4, 3)
         ), HttpStatusCode.NotAcceptable
         )
     }
@@ -158,8 +167,8 @@ class Tests {
         testGet("/getResults", HttpStatusCode.NotAcceptable)
     }
 
-    fun testResults(rows: Int, columns: Int, startRow: Int, startColumn: Int, endRow: Int, endColumn: Int,
-                    status: HttpStatusCode) {
+    private fun testResults(rows: Int, columns: Int, startRow: Int, startColumn: Int, endRow: Int, endColumn: Int,
+                            status: HttpStatusCode) {
         testGet("/getResults?rows=$rows&columns=$columns&startRow=$startRow&startColumn=$startColumn&endRow=$endRow&endColumn=$endColumn", status)
     }
 
@@ -170,36 +179,33 @@ class Tests {
 
     @Test
     fun testResults2() {
-        testResults(5, 5, 0, 0, 1, 0, HttpStatusCode.OK)
+        testResults(5, 5, 1, 2, 4, 3, HttpStatusCode.OK)
     }
 
     @Test
     fun testResults3() {
         testSequence(listOf(
-            Coords(0, 0),
-            Coords(2, 1),
-            Coords(0, 2),
+            Coords(1, 2),
+            Coords(0, 4),
             Coords(2, 3),
             Coords(3, 1),
-            Coords(1, 0)
+            Coords(4, 3)
         ), HttpStatusCode.Accepted, "user1"
         )
         testSequence(listOf(
-            Coords(0, 0),
             Coords(1, 2),
             Coords(3, 1),
-            Coords(1, 0)
+            Coords(4, 3)
         ), HttpStatusCode.Accepted, "user3"
         )
         testSequence(listOf(
-            Coords(0, 0),
             Coords(1, 2),
-            Coords(2, 4),
-            Coords(4, 3),
-            Coords(3, 1),
-            Coords(1, 0)
+            Coords(2, 0),
+            Coords(4, 1),
+            Coords(2, 2),
+            Coords(4, 3)
         ), HttpStatusCode.Accepted, "user2"
         )
-        testResults(5, 5, 0, 0, 1, 0, HttpStatusCode.OK)
+        testResults(5, 5, 1, 2, 4, 3, HttpStatusCode.OK)
     }
 }
