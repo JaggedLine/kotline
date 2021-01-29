@@ -11,6 +11,10 @@ The goal is to create as long polyline as possible.
 
 # Installation
 
+Dependencies:
+
+- JDK 15
+
 You need to compile the "frontend" module by running:
 
 `./gradlew browserDistribution`
