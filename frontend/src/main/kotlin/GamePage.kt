@@ -1,4 +1,5 @@
 import kotlinx.browser.*
+import kotlinx.coroutines.*
 import kotlinx.css.*
 import kotlinx.html.*
 import kotlinx.html.js.*
@@ -12,8 +13,8 @@ import kotlin.js.*
 external interface GamePageState : RState {
     var chainFieldRef: RReadableRef<ChainField>
     var resultsTableRef: RReadableRef<ResultsTable>
-    var fieldList: List<Field>
-    var currentField: Field
+    var fieldsArray: Array<Field>
+    var currentField: Field?
     var won: Boolean
     var score: Int
     var submitting: Boolean
@@ -26,25 +27,28 @@ class GamePage : RComponent<RProps, GamePageState>() {
     init {
         state.chainFieldRef = createRef()
         state.resultsTableRef = createRef()
-        state.fieldList = listOf(
-            Field(
-                sizeX = 6, sizeY = 6,
-                startPoint = Point(3, 3), endPoint = Point(5, 4)
-            ),
-            Field(
-                sizeX = 7, sizeY = 7,
-                startPoint = Point(3, 3), endPoint = Point(6, 4)
-            ),
-            Field(
-                sizeX = 8, sizeY = 8,
-                startPoint = Point(1, 1), endPoint = Point(6, 6)
-            )
-        )
-        state.currentField = state.fieldList.first()
+        state.fieldsArray = emptyArray()
+        state.currentField = null
         state.submitting = false
         state.submitFailed = false
         state.isNameGod = false
         state.godMode = false
+    }
+
+    private suspend fun getFields(): Array<Field> {
+        return window.fetch("/getFields")
+            .await().json().await().unsafeCast<Array<Json>>()
+            .map { it.toField() }.toTypedArray()
+    }
+
+    private fun loadFields() {
+        MainScope().launch {
+            val downloadedFields = getFields()
+            setState {
+                fieldsArray = downloadedFields
+                currentField = fieldsArray.first()
+            }
+        }
     }
 
     private fun submitSolution() {
@@ -55,7 +59,7 @@ class GamePage : RComponent<RProps, GamePageState>() {
         val submitBody = json().apply {
             this["name"] = (document.getElementById("playerName")
                     as HTMLInputElement).value
-            this["field"] = state.currentField.toJson()
+            this["field"] = state.currentField!!.toJson()
             this["solution"] = state.chainFieldRef.current?.getPolyline()
                 ?.map { it.toJson() }
         }
@@ -82,6 +86,10 @@ class GamePage : RComponent<RProps, GamePageState>() {
         }
     }
 
+    override fun componentDidMount() {
+        loadFields()
+    }
+
     override fun RBuilder.render() {
         styledDiv {
             css { +CommonStyles.container }
@@ -92,18 +100,20 @@ class GamePage : RComponent<RProps, GamePageState>() {
                 }
                 styledDiv {
                     css { +GamePageStyles.fieldContainer }
-                    child(ChainField::class) {
-                        attrs {
-                            field = state.currentField
-                            onPolylineChange = { polyline ->
-                                setState {
-                                    won = polyline.last() == field.endPoint
-                                    score = polyline.size - 1
+                    if (state.currentField != null) {
+                        child(ChainField::class) {
+                            attrs {
+                                field = state.currentField!!
+                                onPolylineChange = { polyline ->
+                                    setState {
+                                        won = polyline.last() == field.endPoint
+                                        score = polyline.size - 1
+                                    }
                                 }
+                                chainFieldStyle()
                             }
-                            chainFieldStyle()
+                            ref = state.chainFieldRef
                         }
-                        ref = state.chainFieldRef
                     }
                 }
                 styledDiv {
@@ -127,11 +137,11 @@ class GamePage : RComponent<RProps, GamePageState>() {
                                         val index = (it.target as HTMLSelectElement)
                                             .value.toInt()
                                         setState {
-                                            currentField = fieldList[index]
+                                            currentField = fieldsArray[index]
                                         }
                                     }
                                 }
-                                state.fieldList.forEachIndexed { index, field ->
+                                state.fieldsArray.forEachIndexed { index, field ->
                                     option {
                                         attrs {
                                             value = "$index"
@@ -205,7 +215,7 @@ class GamePage : RComponent<RProps, GamePageState>() {
                             }
                         }
                     }
-                    if (!state.godMode) {
+                    if (!state.godMode && state.currentField != null) {
                         styledDiv {
                             css { +CommonStyles.scrollableWrapper }
                             styledDiv {
@@ -217,7 +227,7 @@ class GamePage : RComponent<RProps, GamePageState>() {
                                 }
                                 child(ResultsTable::class) {
                                     attrs {
-                                        field = state.currentField
+                                        field = state.currentField!!
                                     }
                                     ref = state.resultsTableRef
                                 }

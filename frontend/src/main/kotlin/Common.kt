@@ -14,6 +14,10 @@ fun Point.toJson(): Json {
     }
 }
 
+fun Json.toPoint(): Point {
+    return Point(x = this["row"] as Int, y = this["column"] as Int)
+}
+
 data class Field(var sizeX: Int, var sizeY: Int, var startPoint: Point, var endPoint: Point)
 
 fun Field.toJson(): Json {
@@ -36,6 +40,15 @@ fun Field.toQueryString(): String {
         append("endRow", this@toQueryString.endPoint.x.toString())
         append("endColumn", this@toQueryString.endPoint.y.toString())
     }.toString()
+}
+
+fun Json.toField(): Field {
+    return Field(
+        sizeX = this["size"].unsafeCast<Json>()["rows"].unsafeCast<Int>(),
+        sizeY = this["size"].unsafeCast<Json>()["columns"].unsafeCast<Int>(),
+        startPoint = this["start"].unsafeCast<Json>().toPoint(),
+        endPoint = this["end"].unsafeCast<Json>().toPoint()
+    )
 }
 
 fun crossProduct(a: Point, b: Point): Int {
