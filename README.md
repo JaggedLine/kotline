@@ -25,4 +25,7 @@ To run the server, execute this command:
 
 `./gradlew run`
 
-You can specify the port by modifying `backend/main/resources/application.conf`
+You can specify the port by modifying `backend/main/resources/application.conf`.
+In addition, you can adjust the list of available fields by modifying `backend/main/resources/fields.json`
+
+The database will be stored in `backend/database`
