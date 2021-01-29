@@ -39,3 +39,12 @@ Accept: application/json
 "column": 4
 }
 }
+
+###
+POST http://localhost:8080/submit
+Content-Type: application/json
+
+{
+  "hi" : "server"
+}
+
