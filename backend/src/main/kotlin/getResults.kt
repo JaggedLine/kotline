@@ -5,6 +5,7 @@ import io.ktor.routing.*
 
 fun parseFields(queryParameters: Parameters): Field? {
     for (param in listOf("rows", "columns", "startRow", "startColumn", "endRow", "endColumn")) {
+        println(param)
         queryParameters[param] ?: return null
     }
     return Field(
@@ -29,8 +30,9 @@ fun Route.getResults(dsl: DSL) {
             val field: Field? = parseFields(call.parameters)
             if (field == null) {
                 call.respondText("Incorrect query", status = HttpStatusCode.NotAcceptable)
+                return@get
             }
-            call.respond(dsl.get(field!!))
+            call.respond(dsl.get(field))
         }
     }
 }

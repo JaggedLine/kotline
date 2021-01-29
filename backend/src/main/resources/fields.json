@@ -1,6 +1,20 @@
 [
   {
     "size": {
+      "rows": 5,
+      "columns": 5
+    },
+    "start": {
+      "row": 0,
+      "column": 0
+    },
+    "end": {
+      "row": 1,
+      "column": 0
+    }
+  },
+  {
+    "size": {
       "rows": 6,
       "columns": 6
     },
