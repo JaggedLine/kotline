@@ -53,4 +53,39 @@ object GamePageStyles : StyleSheet("GamePageStyles", isStatic = true) {
         fontSize = 1.em
     }
     val enterGodModeButton = submitButton
+
+    val godSettingsSection by css {
+        display = Display.flex
+        flexDirection = FlexDirection.column
+        padding(30.px)
+    }
+    val godSettingsRow by css {
+        display = Display.flex
+        flexDirection = FlexDirection.row
+        alignItems = Align.center
+        marginBottom = 10.px
+    }
+    val godSettingsRowTitle by css {
+        flexGrow = 2.0
+        flexBasis = FlexBasis("0")
+        margin(0.px)
+        fontWeight = FontWeight.normal
+    }
+    val godSettingsRowLabel by css {
+        flexGrow = 1.0
+        flexBasis = FlexBasis("0")
+    }
+    val godSettingsRowInput by css {
+        width = 100.pct
+        fontSize = 1.em
+        textAlign = TextAlign.center
+    }
+    val godSettingsRowSplitter by css {
+        width = 40.px
+        textAlign = TextAlign.center
+    }
+    val godSettingsApply by css {
+        marginTop = 20.px
+        fontSize = 1.em
+    }
 }

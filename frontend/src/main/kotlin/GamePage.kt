@@ -118,40 +118,40 @@ class GamePage : RComponent<RProps, GamePageState>() {
                 }
                 styledDiv {
                     css { +GamePageStyles.rightContainer }
-                    styledDiv {
-                        css { +GamePageStyles.submitSection }
+                    if (!state.godMode) {
                         styledDiv {
-                            css { +GamePageStyles.sizeRow }
-                            styledH3 {
-                                css { +GamePageStyles.sizeTitle }
-                                +"Field size:"
-                            }
-                            styledSelect {
-                                css {
-                                    +CommonStyles.mySelect
-                                    +CommonStyles.darkGreenButton
-                                    +GamePageStyles.sizeValue
+                            css { +GamePageStyles.submitSection }
+                            styledDiv {
+                                css { +GamePageStyles.sizeRow }
+                                styledH3 {
+                                    css { +GamePageStyles.sizeTitle }
+                                    +"Field size:"
                                 }
-                                attrs {
-                                    onChangeFunction = {
-                                        val index = (it.target as HTMLSelectElement)
-                                            .value.toInt()
-                                        setState {
-                                            currentField = fieldsArray[index]
+                                styledSelect {
+                                    css {
+                                        +CommonStyles.mySelect
+                                        +CommonStyles.darkGreenButton
+                                        +GamePageStyles.sizeValue
+                                    }
+                                    attrs {
+                                        onChangeFunction = {
+                                            val index = (it.target as HTMLSelectElement)
+                                                .value.toInt()
+                                            setState {
+                                                currentField = fieldsArray[index]
+                                            }
+                                        }
+                                    }
+                                    state.fieldsArray.forEachIndexed { index, field ->
+                                        option {
+                                            attrs {
+                                                value = "$index"
+                                            }
+                                            +"${field.sizeX} x ${field.sizeY}"
                                         }
                                     }
                                 }
-                                state.fieldsArray.forEachIndexed { index, field ->
-                                    option {
-                                        attrs {
-                                            value = "$index"
-                                        }
-                                        +"${field.sizeX} x ${field.sizeY}"
-                                    }
-                                }
                             }
-                        }
-                        if (!state.godMode) {
                             label {
                                 styledInput {
                                     css {
@@ -214,23 +214,179 @@ class GamePage : RComponent<RProps, GamePageState>() {
                                 }
                             }
                         }
-                    }
-                    if (!state.godMode && state.currentField != null) {
-                        styledDiv {
-                            css { +CommonStyles.scrollableWrapper }
+                        if (state.currentField != null) {
                             styledDiv {
+                                css { +CommonStyles.scrollableWrapper }
+                                styledDiv {
+                                    css {
+                                        +CommonStyles.scrollable
+                                        media("(max-width: 850px)") {
+                                            position = Position.relative
+                                        }
+                                    }
+                                    child(ResultsTable::class) {
+                                        attrs {
+                                            field = state.currentField!!
+                                        }
+                                        ref = state.resultsTableRef
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        styledDiv {
+                            css { +GamePageStyles.godSettingsSection }
+                            styledDiv {
+                                css { +GamePageStyles.godSettingsRow }
+                                styledH3 {
+                                    css { +GamePageStyles.godSettingsRowTitle }
+                                    +"Field size:"
+                                }
+                                styledLabel {
+                                    css { +GamePageStyles.godSettingsRowLabel }
+                                    styledInput {
+                                        css {
+                                            +CommonStyles.myInput
+                                            +GamePageStyles.godSettingsRowInput
+                                        }
+                                        attrs {
+                                            defaultValue = state.currentField!!.sizeX.toString()
+                                            id = "sizeX"
+                                        }
+                                    }
+                                }
+                                styledDiv {
+                                    css { +GamePageStyles.godSettingsRowSplitter }
+                                    +"x"
+                                }
+                                styledLabel {
+                                    css { +GamePageStyles.godSettingsRowLabel }
+                                    styledInput {
+                                        css {
+                                            +CommonStyles.myInput
+                                            +GamePageStyles.godSettingsRowInput
+                                        }
+                                        attrs {
+                                            defaultValue = state.currentField!!.sizeY.toString()
+                                            id = "sizeY"
+                                        }
+                                    }
+                                }
+                            }
+                            styledDiv {
+                                css { +GamePageStyles.godSettingsRow }
+                                styledH3 {
+                                    css { +GamePageStyles.godSettingsRowTitle }
+                                    +"Start point:"
+                                }
+                                styledLabel {
+                                    css { +GamePageStyles.godSettingsRowLabel }
+                                    styledInput {
+                                        css {
+                                            +CommonStyles.myInput
+                                            +GamePageStyles.godSettingsRowInput
+                                        }
+                                        attrs {
+                                            defaultValue = state.currentField!!.startPoint.x.toString()
+                                            id = "startX"
+                                        }
+                                    }
+                                }
+                                styledDiv {
+                                    css { +GamePageStyles.godSettingsRowSplitter }
+                                    +","
+                                }
+                                styledLabel {
+                                    css { +GamePageStyles.godSettingsRowLabel }
+                                    styledInput {
+                                        css {
+                                            +CommonStyles.myInput
+                                            +GamePageStyles.godSettingsRowInput
+                                        }
+                                        attrs {
+                                            defaultValue = state.currentField!!.startPoint.y.toString()
+                                            id = "startY"
+                                        }
+                                    }
+                                }
+                            }
+                            styledDiv {
+                                css { +GamePageStyles.godSettingsRow }
+                                styledH3 {
+                                    css { +GamePageStyles.godSettingsRowTitle }
+                                    +"End point:"
+                                }
+                                styledLabel {
+                                    css { +GamePageStyles.godSettingsRowLabel }
+                                    styledInput {
+                                        css {
+                                            +CommonStyles.myInput
+                                            +GamePageStyles.godSettingsRowInput
+                                        }
+                                        attrs {
+                                            defaultValue = state.currentField!!.endPoint.x.toString()
+                                            id = "endX"
+                                        }
+                                    }
+                                }
+                                styledDiv {
+                                    css { +GamePageStyles.godSettingsRowSplitter }
+                                    +","
+                                }
+                                styledLabel {
+                                    css { +GamePageStyles.godSettingsRowLabel }
+                                    styledInput {
+                                        css {
+                                            +CommonStyles.myInput
+                                            +GamePageStyles.godSettingsRowInput
+                                        }
+                                        attrs {
+                                            defaultValue = state.currentField!!.endPoint.y.toString()
+                                            id = "endY"
+                                        }
+                                    }
+                                }
+                            }
+                            styledButton {
                                 css {
-                                    +CommonStyles.scrollable
-                                    media("(max-width: 850px)") {
-                                        position = Position.relative
+                                    +CommonStyles.myButton
+                                    +CommonStyles.darkGreenButton
+                                    +GamePageStyles.godSettingsApply
+                                }
+                                attrs {
+                                    onClickFunction = {
+                                        val newSizeX = (document.getElementById("sizeX")
+                                                as HTMLInputElement).value.toInt()
+                                        val newSizeY = (document.getElementById("sizeY")
+                                                as HTMLInputElement).value.toInt()
+                                        val newStartX = (document.getElementById("startX")
+                                                as HTMLInputElement).value.toInt()
+                                        val newStartY = (document.getElementById("startY")
+                                                as HTMLInputElement).value.toInt()
+                                        val newEndX = (document.getElementById("endX")
+                                                as HTMLInputElement).value.toInt()
+                                        val newEndY = (document.getElementById("endY")
+                                                as HTMLInputElement).value.toInt()
+                                        val newField = Field(
+                                            sizeX = newSizeX,
+                                            sizeY = newSizeY,
+                                            startPoint = Point(
+                                                x = newStartX,
+                                                y = newStartY
+                                            ),
+                                            endPoint = Point(
+                                                x = newEndX,
+                                                y = newEndY
+                                            )
+                                        )
+                                        if (isFieldValid(newField)) {
+                                            setState {
+                                                currentField = newField
+                                            }
+                                        }
                                     }
                                 }
-                                child(ResultsTable::class) {
-                                    attrs {
-                                        field = state.currentField!!
-                                    }
-                                    ref = state.resultsTableRef
-                                }
+                                +"Apply"
                             }
                         }
                     }

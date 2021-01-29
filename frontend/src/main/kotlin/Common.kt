@@ -90,3 +90,25 @@ fun canAdd(polyline: List<Point>, nextPoint: Point): Boolean {
     }
     return true
 }
+
+fun isFieldValid(field: Field): Boolean {
+    if (field.sizeX > 15 || field.sizeY > 15) {
+        return false
+    }
+    if (field.startPoint.x < 0 || field.startPoint.x >= field.sizeX) {
+        return false
+    }
+    if (field.startPoint.y < 0 || field.startPoint.y >= field.sizeY) {
+        return false
+    }
+    if (field.endPoint.x < 0 || field.endPoint.x >= field.sizeX) {
+        return false
+    }
+    if (field.endPoint.y < 0 || field.endPoint.y >= field.sizeY) {
+        return false
+    }
+    if (field.startPoint == field.endPoint) {
+        return false
+    }
+    return true
+}
