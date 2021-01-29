@@ -88,4 +88,19 @@ object GamePageStyles : StyleSheet("GamePageStyles", isStatic = true) {
         marginTop = 20.px
         fontSize = 1.em
     }
+    val godComputerSection by css {
+        display = Display.flex
+        flexDirection = FlexDirection.column
+        padding(0.px, 30.px, 30.px, 30.px)
+        marginTop = LinearDimension.auto
+    }
+    val godComputerScore by css {
+        margin(0.px)
+        fontWeight = FontWeight.normal
+        textAlign = TextAlign.center
+    }
+    val godComputerStart by css {
+        marginTop = 10.px
+        fontSize = 1.em
+    }
 }

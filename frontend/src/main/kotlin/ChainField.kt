@@ -47,6 +47,13 @@ class ChainField : RComponent<ChainFieldProps, ChainFieldState>() {
         return state.polyline
     }
 
+    fun setPolyline(newPolyline: List<Point>) {
+        setState {
+            polyline = newPolyline.toMutableList()
+            props.onPolylineChange(polyline)
+        }
+    }
+
     fun clearPolyline() {
         setState {
             polyline = mutableListOf(props.field.startPoint)

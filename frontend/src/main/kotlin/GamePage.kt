@@ -21,6 +21,7 @@ external interface GamePageState : RState {
     var submitFailed: Boolean
     var isNameGod: Boolean
     var godMode: Boolean
+    var finding: Boolean
 }
 
 class GamePage : RComponent<RProps, GamePageState>() {
@@ -33,6 +34,7 @@ class GamePage : RComponent<RProps, GamePageState>() {
         state.submitFailed = false
         state.isNameGod = false
         state.godMode = false
+        state.finding = false
     }
 
     private suspend fun getFields(): Array<Field> {
@@ -82,6 +84,26 @@ class GamePage : RComponent<RProps, GamePageState>() {
             setState {
                 submitting = false
                 submitFailed = true
+            }
+        }
+    }
+
+    private fun launchWorker() {
+        setState {
+            finding = true
+        }
+        val worker = Worker("worker.js")
+        worker.postMessage(state.currentField!!.toJson())
+        worker.onmessage = { e ->
+            val data = e.data.unsafeCast<Json>()
+            if (data["finished"] as Boolean) {
+                setState {
+                    finding = false
+                }
+            } else {
+                val polylineToDisplay = data["polyline"].unsafeCast<Array<Json>>()
+                    .map { it.toPoint() }
+                state.chainFieldRef.current?.setPolyline(polylineToDisplay)
             }
         }
     }
@@ -354,6 +376,7 @@ class GamePage : RComponent<RProps, GamePageState>() {
                                     +GamePageStyles.godSettingsApply
                                 }
                                 attrs {
+                                    disabled = state.finding
                                     onClickFunction = {
                                         val newSizeX = (document.getElementById("sizeX")
                                                 as HTMLInputElement).value.toInt()
@@ -387,6 +410,30 @@ class GamePage : RComponent<RProps, GamePageState>() {
                                     }
                                 }
                                 +"Apply"
+                            }
+                        }
+                        styledDiv {
+                            css { +GamePageStyles.godComputerSection }
+                            styledH3 {
+                                css { +GamePageStyles.godComputerScore }
+                                +"Current length: ${state.score}"
+                            }
+                            styledButton {
+                                css {
+                                    +CommonStyles.myButton
+                                    +CommonStyles.darkGreenButton
+                                    +GamePageStyles.godComputerStart
+                                }
+                                attrs {
+                                    disabled = state.finding
+                                    onClickFunction = {
+                                        launchWorker()
+                                    }
+                                }
+                                when {
+                                    state.finding -> +"Finding..."
+                                    else -> +"Find the best solution!"
+                                }
                             }
                         }
                     }
