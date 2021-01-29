@@ -5,7 +5,6 @@ import io.ktor.routing.*
 
 fun parseFields(queryParameters: Parameters): Field? {
     for (param in listOf("rows", "columns", "startRow", "startColumn", "endRow", "endColumn")) {
-        println(param)
         queryParameters[param] ?: return null
     }
     return Field(
