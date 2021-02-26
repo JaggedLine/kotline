@@ -5,6 +5,7 @@ object RulesPopupStyles : StyleSheet("RulesPopupStyles", isStatic = true) {
     val header by css {
         display = Display.flex
         flexDirection = FlexDirection.row
+        flexShrink = 0.0
         padding(15.px)
         borderBottom = "1px solid whitesmoke"
     }
