@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-js"))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-js:1.5.21")
 
     //React, React DOM + Wrappers
     implementation("org.jetbrains:kotlin-react:16.13.1-pre.110-kotlin-1.4.0")
@@ -26,7 +26,7 @@ dependencies {
     implementation(npm("inline-style-prefixer", "~6.0.0"))
 
     //Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt")
 }
 
 kotlin {
