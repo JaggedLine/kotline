@@ -1,36 +1,35 @@
 import react.*
 
-enum class Pages {
+enum class Page {
     MAIN_PAGE,
     GAME_PAGE
 }
 
+enum class Popup {
+    ABOUT_POPUP,
+    RULES_POPUP
+}
+
 external interface AppState : RState {
-    var page: Pages
-    var rulesShown: Boolean
+    var page: Page
+    var popup: Popup?
 }
 
 class App : RComponent<RProps, AppState>() {
     init {
-        state.page = Pages.MAIN_PAGE
-        state.rulesShown = false
+        state.page = Page.MAIN_PAGE
+        state.popup = null
     }
 
-    private fun showPage(newPage: Pages) {
+    private fun showPage(newPage: Page) {
         setState {
             page = newPage
         }
     }
 
-    private fun showRules() {
+    private fun showPopup(newPopup: Popup?) {
         setState {
-            rulesShown = true
-        }
-    }
-
-    private fun closeRules() {
-        setState {
-            rulesShown = false
+            popup = newPopup
         }
     }
 
@@ -38,31 +37,41 @@ class App : RComponent<RProps, AppState>() {
         child(Navbar::class) {
             attrs {
                 showMainPageFunc = {
-                    showPage(Pages.MAIN_PAGE)
+                    showPage(Page.MAIN_PAGE)
+                }
+                showAboutPopupFunc = {
+                    showPopup(Popup.ABOUT_POPUP)
                 }
                 showRulesPopupFunc = {
-                    showRules()
+                    showPopup(Popup.RULES_POPUP)
                 }
             }
         }
         when (state.page) {
-            Pages.MAIN_PAGE -> child(MainPage::class) {
+            Page.MAIN_PAGE -> child(MainPage::class) {
                 attrs {
                     showGamePageFunc = {
-                        showPage(Pages.GAME_PAGE)
+                        showPage(Page.GAME_PAGE)
                     }
                     showRulesPopupFunc = {
-                        showRules()
+                        showPopup(Popup.RULES_POPUP)
                     }
                 }
             }
-            Pages.GAME_PAGE -> child(GamePage::class) {}
+            Page.GAME_PAGE -> child(GamePage::class) {}
         }
-        if (state.rulesShown) {
-            child(RulesPopup::class) {
+        when (state.popup) {
+            Popup.ABOUT_POPUP -> child(AboutPopup::class) {
                 attrs {
                     close = {
-                        closeRules()
+                        showPopup(null)
+                    }
+                }
+            }
+            Popup.RULES_POPUP -> child(RulesPopup::class) {
+                attrs {
+                    close = {
+                        showPopup(null)
                     }
                 }
             }

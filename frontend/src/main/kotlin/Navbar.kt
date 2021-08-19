@@ -4,6 +4,7 @@ import styled.*
 
 external interface NavbarProps : RProps {
     var showMainPageFunc: () -> Unit
+    var showAboutPopupFunc: () -> Unit
     var showRulesPopupFunc: () -> Unit
 }
 
@@ -27,7 +28,20 @@ class Navbar : RComponent<NavbarProps, RState>() {
                 css {
                     +CommonStyles.linkButton
                     +CommonStyles.hoverUnderline
-                    +NavbarStyles.rules
+                    +NavbarStyles.navbarLink
+                }
+                attrs {
+                    onClickFunction = {
+                        props.showAboutPopupFunc()
+                    }
+                }
+                +"About"
+            }
+            styledButton {
+                css {
+                    +CommonStyles.linkButton
+                    +CommonStyles.hoverUnderline
+                    +NavbarStyles.navbarLink
                 }
                 attrs {
                     onClickFunction = {

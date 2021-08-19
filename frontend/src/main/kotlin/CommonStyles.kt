@@ -9,32 +9,6 @@ object CommonStyles : StyleSheet("CommonStyles", isStatic = true) {
         flexGrow = 1.0
         flexDirection = FlexDirection.column
     }
-    val popupWrapper by css {
-        position = Position.fixed
-        top = 0.px
-        left = 0.px
-        bottom = 0.px
-        right = 0.px
-        display = Display.flex
-        backgroundColor = rgba(0, 0, 0, 0.4)
-        zIndex = 1000
-    }
-    val popup by css {
-        display = Display.flex
-        flexDirection = FlexDirection.column
-        margin(LinearDimension.auto)
-        height = 100.pct - 20.px
-        maxHeight = 600.px
-        width = 100.pct - 20.px
-        maxWidth = 900.px
-        backgroundColor = Color.white
-        borderRadius = 20.px
-        boxShadow(Color.dimGrey, (-3).px, 3.px, 10.px)
-        media("(max-height: 600px), (max-width: 900px)") {
-            maxHeight = LinearDimension.initial
-            maxWidth = LinearDimension.initial
-        }
-    }
     val scrollableWrapper by css {
         position = Position.relative
         flexGrow = 1.0

@@ -14,7 +14,8 @@ object NavbarStyles : StyleSheet("NavbarStyles", isStatic = true) {
         fontSize = 30.px
         fontWeight = FontWeight.bold
     }
-    val rules by css {
+    val navbarLink by css {
+        marginLeft = 20.px
         color = Color.lightGrey
         fontSize = 18.px
         fontWeight = FontWeight.bold
