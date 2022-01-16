@@ -10,7 +10,6 @@ version = "1.0-SNAPSHOT"
 repositories {
     jcenter()
     mavenCentral()
-    maven("https://kotlin.bintray.com/kotlinx")
 }
 
 dependencies {
