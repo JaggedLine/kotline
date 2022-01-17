@@ -1,6 +1,6 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm")
-    id("org.jetbrains.kotlin.plugin.serialization")
+    kotlin("jvm")
+    kotlin("plugin.serialization")
     application
 }
 
@@ -28,7 +28,7 @@ dependencies {
 }
 
 application {
-    mainClassName = "ApplicationKt"
+    mainClass.set("ApplicationKt")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
