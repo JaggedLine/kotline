@@ -36,3 +36,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
         jvmTarget = "1.8"
     }
 }
+
+tasks.named<Copy>("processResources") {
+    val jsBrowserDistribution = project(":frontend").tasks.named("browserDistribution")
+    from(jsBrowserDistribution) { into("static") }
+}

@@ -20,7 +20,7 @@ fun Application.module() {
         getResults(dsl)
         getFields(dsl)
         static {
-            staticRootFolder = File("../frontend/build/distributions")
+            staticRootFolder = File("build/resources/main/static")
             default("index.html")
             files(".")
         }
