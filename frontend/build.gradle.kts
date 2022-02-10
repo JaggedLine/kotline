@@ -6,7 +6,6 @@ group = "org.example"
 version = "1.0-SNAPSHOT"
 
 repositories {
-    maven("https://kotlin.bintray.com/kotlin-js-wrappers/")
     mavenCentral()
     jcenter()
 }
@@ -26,7 +25,7 @@ dependencies {
     implementation(npm("inline-style-prefixer", "~6.0.0"))
 
     //Coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1-native-mt")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
 }
 
 kotlin {
