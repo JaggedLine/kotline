@@ -1,8 +1,8 @@
-# Kotlin line
+# KotLine
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Kotlin line is a web-application for the "Jagged line" game. 
+KotLine is a web-application for the "Jagged line" game. 
 The player's task in this game is to construct a polyline from start to end.
 Each segment should be a knight's move, and the segments can not intersect.
 The goal is to create as long polyline as possible.

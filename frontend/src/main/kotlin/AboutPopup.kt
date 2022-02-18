@@ -50,7 +50,7 @@ class AboutPopup : RComponent<AboutPopupProps, RState>() {
                         """.trimMargin()
                         a {
                             +"repository"
-                            attrs { href = "https://github.com/JaggedLine/KotlinLine" }
+                            attrs { href = "https://github.com/JaggedLine/kot-line" }
                         }
                         +" on GitHub. If you notice any bugs, please leave an issue."
                     }
