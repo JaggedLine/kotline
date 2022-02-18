@@ -1,4 +1,4 @@
-rootProject.name = "kot-line"
+rootProject.name = "kotline"
 
 include("frontend")
 include("backend")
