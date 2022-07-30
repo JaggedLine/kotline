@@ -28,8 +28,8 @@ fun intersect1(_a: Int, _b: Int, _c: Int, _d: Int): Boolean {
 }
 
 fun intersect(A: Coords, B: Coords, C: Coords, D: Coords): Boolean {
-    return intersect1 (A.row, B.row, C.row, D.row)
-            && intersect1 (A.column, B.column, C.column, D.column)
+    return intersect1(A.row, B.row, C.row, D.row)
+            && intersect1(A.column, B.column, C.column, D.column)
             && area(A, B, C) * area(A, B, D) <= 0
             && area(C, D, A) * area(C, D, B) <= 0
 }

@@ -75,6 +75,7 @@ class App : RComponent<RProps, AppState>() {
                     }
                 }
             }
+            null -> {}
         }
     }
 }

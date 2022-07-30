@@ -34,7 +34,7 @@ class DSL(private val connection: Database) {
                     this[FieldsTable.description] = Json.encodeToString(it)
                 }
             }
-    }
+        }
     }
 
     private fun removeOccurrences(name: String, standings: List<ResultsTableRow>, newSize: Int): Boolean {
@@ -122,7 +122,7 @@ class DSL(private val connection: Database) {
         return GetResultsResponse(transaction(connection) {
             ResultsTable.select { ResultsTable.fieldId eq fieldId }
                 .orderBy(ResultsTable.score to SortOrder.DESC)
-                .map {
+                .map { it ->
                     Result(
                         it[ResultsTable.score],
                         Json.decodeFromString<List<String>>(it[ResultsTable.names]).map {

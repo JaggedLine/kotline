@@ -62,8 +62,8 @@ class GamePage : RComponent<RProps, GamePageState>() {
             this["name"] = (document.getElementById("playerName")
                     as HTMLInputElement).value
             this["field"] = state.currentField!!.toJson()
-            this["solution"] = state.chainFieldRef.current?.getPolyline()
-                ?.map { it.toJson() }
+            this["solution"] = state.chainFieldRef.current.getPolyline()
+                .map { it.toJson() }
         }
         window.fetch(
             "/submit", RequestInit(
@@ -74,8 +74,8 @@ class GamePage : RComponent<RProps, GamePageState>() {
                 body = JSON.stringify(submitBody)
             )
         ).then {
-            state.resultsTableRef.current?.loadResults()
-            state.chainFieldRef.current?.clearPolyline()
+            state.resultsTableRef.current.loadResults()
+            state.chainFieldRef.current.clearPolyline()
             setState {
                 submitting = false
                 submitFailed = false
@@ -103,7 +103,7 @@ class GamePage : RComponent<RProps, GamePageState>() {
             } else {
                 val polylineToDisplay = data["polyline"].unsafeCast<Array<Json>>()
                     .map { it.toPoint() }
-                state.chainFieldRef.current?.setPolyline(polylineToDisplay)
+                state.chainFieldRef.current.setPolyline(polylineToDisplay)
             }
         }
     }
