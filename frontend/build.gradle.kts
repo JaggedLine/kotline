@@ -13,7 +13,7 @@ repositories {
 dependencies {
     implementation("org.jetbrains:kotlin-react:17.0.1-pre.148-kotlin-1.4.21")
     implementation("org.jetbrains:kotlin-styled:5.2.1-pre.148-kotlin-1.4.21")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 }
 
 kotlin {
