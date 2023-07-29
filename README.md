@@ -15,17 +15,11 @@ Dependencies:
 
 - JDK 15
 
-You need to compile the "frontend" module by running:
-
-`./gradlew browserDistribution`
-
-You have to do it before the first run.
-
-To run the server, execute this command:
+To run the server, execute
 
 `./gradlew run`
 
-You can specify the port by modifying `backend/main/resources/application.conf`.
-In addition, you can adjust the list of available fields by modifying `backend/main/resources/fields.json`
+You can specify the port by modifying `src/jvmMain/resources/application.conf`.
+You can adjust the list of available fields by modifying `src/jvmMain/resources/fields.json`
 
-The database will be stored in `backend/database`
+The database will be stored in the `database` folder.
