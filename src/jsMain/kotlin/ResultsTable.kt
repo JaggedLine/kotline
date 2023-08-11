@@ -14,17 +14,17 @@ external interface ResultsTableProps : Props {
 }
 
 external interface ResultsTableState : State {
-    var client: HttpClient
     var results: Results
 }
 
 class ResultsTable : RComponent<ResultsTableProps, ResultsTableState>() {
-    init {
-        state.client = HttpClient {
-            install(ContentNegotiation) {
-                json()
-            }
+    private val client = HttpClient {
+        install(ContentNegotiation) {
+            json()
         }
+    }
+
+    init {
         state.results = Results(emptyList())
     }
 
@@ -36,7 +36,7 @@ class ResultsTable : RComponent<ResultsTableProps, ResultsTableState>() {
                 "&startColumn=${props.field.start.column}" +
                 "&endRow=${props.field.end.row}" +
                 "&endColumn=${props.field.end.column}"
-        return state.client.get(url).body()
+        return client.get(url).body()
     }
 
     fun loadResults() {

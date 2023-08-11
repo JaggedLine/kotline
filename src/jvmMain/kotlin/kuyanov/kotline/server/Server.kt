@@ -1,4 +1,4 @@
-package server.application
+package kuyanov.kotline.server
 
 import Coords
 import Field
@@ -9,6 +9,7 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.html.*
 import io.ktor.server.http.content.*
+import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -29,22 +30,26 @@ fun HTML.index() {
     }
 }
 
-fun main(args: Array<String>) = io.ktor.server.netty.EngineMain.main(args)
+fun main(args: Array<String>) = EngineMain.main(args)
 
 fun Application.module() {
     install(ContentNegotiation) {
         json()
     }
+
     val dsl = DSL(
         Database.connect("jdbc:h2:./database/results.db", driver = "org.h2.Driver"),
     )
+
     routing {
         get("/") {
             call.respondHtml(HttpStatusCode.OK, HTML::index)
         }
+
         get("/getFields") {
             call.respond(dsl.getFields())
         }
+
         get("/getResults") {
             for (param in listOf("rows", "columns", "startRow", "startColumn", "endRow", "endColumn")) {
                 if (call.parameters[param] == null) {
@@ -73,6 +78,7 @@ fun Application.module() {
             }
             call.respond(results)
         }
+
         post("/submit") {
             val submission: Submission
             try {
@@ -83,7 +89,7 @@ fun Application.module() {
             }
             val status = dsl.insert(submission)
             if (status.first) {
-                call.respondText("The result has been received", status = HttpStatusCode.Accepted)
+                call.respondText("The result has been received")
             } else {
                 call.respondText(
                     "The result was not admitted, reason: ${status.second}",
@@ -91,6 +97,7 @@ fun Application.module() {
                 )
             }
         }
+
         static("/static") {
             resources()
         }

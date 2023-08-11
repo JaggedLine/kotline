@@ -38,18 +38,19 @@ class RulesPopup : RComponent<RulesPopupProps, State>() {
                     css { +PopupStyles.content }
                     p {
                         +"""You have to build a polygonal chain using the vertices of the
-                            |grid, starting and ending at """.trimMargin()
+                            grid, starting and ending at 
+                        """.trimIndent()
                         span("fas fa-circle") {}
                         +""". Each segment should be a knight move, and they shouldn't intersect.
-                            |The score is the number of segments in the polyline.
-                            |Try to get the highest score!
-                        """.trimMargin()
+                            The score is the number of segments in the polyline.
+                            Try to get the highest score!
+                        """.trimIndent()
                     }
                     p {
                         +"""You can add a segment to your polyline by clicking the corresponding node.
-                            |To delete several segments from the end, click the node of your chain, and
-                            |it will become an end. An animated example is below:
-                        """.trimMargin()
+                            To delete several segments from the end, click the node of your chain, and
+                            it will become an end. An animated example is below:
+                        """.trimIndent()
                     }
                     styledImg("example", "/static/example.gif") {
                         css {

@@ -1,10 +1,10 @@
+import kotlin.math.*
 import kotlinx.css.*
 import kotlinx.css.properties.*
 import kotlinx.html.js.*
 import react.*
 import react.dom.*
 import styled.*
-import kotlin.math.*
 
 fun canAdd(polyline: List<Coords>, nextPoint: Coords): Boolean {
     if ((nextPoint - polyline.last()).norm() != 5) {

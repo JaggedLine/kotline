@@ -37,7 +37,8 @@ class AboutPopup : RComponent<AboutPopupProps, State>() {
                     css { +PopupStyles.content }
                     p {
                         +"""The site was created in January 2021 by two first-year students of the 
-                            |Higher School of Economics:""".trimMargin()
+                            Higher School of Economics:
+                        """.trimIndent()
                     }
                     ul {
                         li { +"Fedor Kuyanov" }
@@ -45,9 +46,9 @@ class AboutPopup : RComponent<AboutPopupProps, State>() {
                     }
                     p {
                         +"""Originally, JaggedLine was a school project at School #57.
-                            |Inspired by this game, we rewrote it from scratch in the Kotlin language,
-                            |giving it a fresh new look. Check out our 
-                        """.trimMargin()
+                            Inspired by this game, we rewrote it from scratch in the Kotlin language,
+                            giving it a fresh new look. Check out our 
+                        """.trimIndent()
                         a {
                             +"repository"
                             attrs { href = "https://github.com/JaggedLine/kotline" }

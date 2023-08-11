@@ -26,8 +26,9 @@ class MainPage : RComponent<MainPageProps, State>() {
                 styledP {
                     css { +MainPageStyles.gameParagraph }
                     +"""Construct the longest non-self-intersecting polyline
-                        |whose vertices are nodes of the grid, and each edge
-                        |is a knight move. Try to get the highest score!""".trimMargin()
+                        whose vertices are nodes of the grid, and each edge
+                        is a knight move. Try to get the highest score!
+                    """.trimIndent()
                 }
                 styledDiv {
                     css { +MainPageStyles.actions }

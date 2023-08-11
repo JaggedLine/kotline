@@ -1,12 +1,13 @@
-import kotlinx.browser.document
 import kotlinx.html.*
 import kotlinx.html.js.*
 import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
-import org.w3c.dom.*
 import react.*
 import react.dom.*
 import styled.*
+import web.dom.*
+import web.html.*
+import web.workers.*
 
 fun isFieldValid(field: Field): Boolean {
     if (field.size.rows > 15 || field.size.columns > 15) {

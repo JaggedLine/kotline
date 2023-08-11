@@ -4,7 +4,7 @@ plugins {
     application
 }
 
-group = "me.feodor"
+group = "kuyanov"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -60,6 +60,7 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation("io.ktor:ktor-server-tests:2.0.2")
+                implementation("io.ktor:ktor-client-content-negotiation:2.0.2")
             }
         }
         val jsMain by getting {
@@ -77,7 +78,7 @@ kotlin {
 }
 
 application {
-    mainClass.set("server.application.ServerKt")
+    mainClass.set("kuyanov.kotline.server.ServerKt")
 }
 
 tasks.named<Copy>("jvmProcessResources") {

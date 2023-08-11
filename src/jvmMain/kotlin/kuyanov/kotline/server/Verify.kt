@@ -1,4 +1,4 @@
-package server.application
+package kuyanov.kotline.server
 
 import Coords
 import Submission

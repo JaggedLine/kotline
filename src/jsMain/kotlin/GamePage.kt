@@ -6,16 +6,15 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.*
 import kotlinx.css.*
+import kotlinx.html.*
 import kotlinx.html.js.*
-import org.w3c.dom.*
 import react.*
 import react.dom.*
 import styled.*
+import web.dom.*
+import web.html.*
 
 external interface GamePageState : State {
-    var client: HttpClient
-    var chainFieldRef: RefObject<ChainField>
-    var resultsTableRef: RefObject<ResultsTable>
     var fieldsArray: Array<Field>
     var field: Field?
     var name: String
@@ -27,14 +26,15 @@ external interface GamePageState : State {
 }
 
 class GamePage : RComponent<Props, GamePageState>() {
-    init {
-        state.client = HttpClient {
-            install(ContentNegotiation) {
-                json()
-            }
+    private val client = HttpClient {
+        install(ContentNegotiation) {
+            json()
         }
-        state.chainFieldRef = createRef()
-        state.resultsTableRef = createRef()
+    }
+    private val chainFieldRef = createRef<ChainField>()
+    private val resultsTableRef = createRef<ResultsTable>()
+
+    init {
         state.fieldsArray = emptyArray()
         state.field = null
         state.name = ""
@@ -44,7 +44,7 @@ class GamePage : RComponent<Props, GamePageState>() {
     }
 
     private suspend fun getFields(): Array<Field> {
-        return state.client.get("/getFields").body()
+        return client.get("/getFields").body()
     }
 
     private suspend fun submitSolution() {
@@ -55,10 +55,10 @@ class GamePage : RComponent<Props, GamePageState>() {
         val submission = Submission(
             state.name,
             state.field!!,
-            state.chainFieldRef.current!!.getPolyline()
+            chainFieldRef.current!!.getPolyline()
         )
         try {
-            state.client.post("/submit") {
+            client.post("/submit") {
                 contentType(ContentType.Application.Json)
                 setBody(submission)
             }
@@ -73,8 +73,8 @@ class GamePage : RComponent<Props, GamePageState>() {
             submitting = false
             submitFailed = false
         }
-        state.resultsTableRef.current!!.loadResults()
-        state.chainFieldRef.current!!.clearPolyline()
+        resultsTableRef.current!!.loadResults()
+        chainFieldRef.current!!.clearPolyline()
     }
 
     override fun componentDidMount() {
@@ -109,7 +109,7 @@ class GamePage : RComponent<Props, GamePageState>() {
                                 }
                                 chainFieldStyle()
                             }
-                            ref = state.chainFieldRef
+                            ref = chainFieldRef
                         }
                     }
                 }
@@ -131,8 +131,10 @@ class GamePage : RComponent<Props, GamePageState>() {
                                         +GamePageStyles.sizeValue
                                     }
                                     attrs {
+                                        id = "field-size"
                                         onChangeFunction = {
-                                            val index = (it.target as HTMLSelectElement).value.toInt()
+                                            val index = (document.getElementById("field-size")
+                                                    as HTMLSelectElement).value.toInt()
                                             setState {
                                                 field = fieldsArray[index]
                                             }
@@ -157,9 +159,11 @@ class GamePage : RComponent<Props, GamePageState>() {
                                     attrs {
                                         placeholder = "Enter your name"
                                         maxLength = "20"
+                                        id = "your-name"
                                         onChangeFunction = {
                                             setState {
-                                                name = (it.target as HTMLInputElement).value
+                                                name = (document.getElementById("your-name")
+                                                        as HTMLInputElement).value
                                             }
                                         }
                                     }
@@ -219,7 +223,7 @@ class GamePage : RComponent<Props, GamePageState>() {
                                         attrs {
                                             field = state.field!!
                                         }
-                                        ref = state.resultsTableRef
+                                        ref = resultsTableRef
                                     }
                                 }
                             }
@@ -227,7 +231,7 @@ class GamePage : RComponent<Props, GamePageState>() {
                     } else {
                         child(GodMode::class) {
                             attrs {
-                                chainFieldRef = state.chainFieldRef
+                                chainFieldRef = this@GamePage.chainFieldRef
                                 onFieldChangeFunc = { newField ->
                                     setState {
                                         field = newField

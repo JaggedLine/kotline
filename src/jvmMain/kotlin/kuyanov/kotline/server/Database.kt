@@ -1,4 +1,4 @@
-package server.application
+package kuyanov.kotline.server
 
 import Coords
 import Field
@@ -54,7 +54,7 @@ class DSL(private val connection: Database) {
                 val newNames = row.names.minus(name)
                 if (newNames.isEmpty()) {
                     transaction(connection) {
-                        ResultsTable.deleteWhere { ResultsTable.id eq row.id }
+                        ResultsTable.deleteWhere { id eq row.id }
                     }
                 } else {
                     transaction(connection) {

@@ -1,11 +1,10 @@
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.testing.*
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.*
 
 class ServerTests {
     private val field = Field(
@@ -22,10 +21,15 @@ class ServerTests {
 
     private fun testSequence(solution: List<Coords>, status: HttpStatusCode, name: String = "test") =
         testApplication {
+            val client = createClient {
+                install(ContentNegotiation) {
+                    json()
+                }
+            }
+            val submission = Submission(name, field, solution)
             val response = client.post("/submit") {
-                val submission = Submission(name, field, solution)
-                header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                setBody(Json.encodeToString(submission))
+                contentType(ContentType.Application.Json)
+                setBody(submission)
             }
             assertEquals(status, response.status)
             println(response.bodyAsText())
@@ -52,7 +56,7 @@ class ServerTests {
     @Test
     fun submitInvalidJSON() = testApplication {
         val response = client.post("/submit") {
-            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            contentType(ContentType.Application.Json)
             setBody("""{"hi": "server"}""")
         }
         assertEquals(HttpStatusCode.NotAcceptable, response.status)
@@ -142,7 +146,7 @@ class ServerTests {
                 Coords(2, 3),
                 Coords(3, 1),
                 Coords(4, 3)
-            ), HttpStatusCode.Accepted
+            ), HttpStatusCode.OK
         )
     }
 
@@ -161,7 +165,7 @@ class ServerTests {
                 Coords(1, 0),
                 Coords(3, 1),
                 Coords(4, 3)
-            ), HttpStatusCode.Accepted
+            ), HttpStatusCode.OK
         )
     }
 
